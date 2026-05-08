@@ -1,0 +1,6 @@
+Flask==2.3.3
+flask_cors==4.0.1
+earthengine-api==0.1.376
+requests==2.31.0
+pyproj==3.6.1
+gunicorn==21.2.0

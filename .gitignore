@@ -1,0 +1,8 @@
+*.pyc
+__pycache__
+*.db
+*.sqlite
+*.sqlite3
+temp_*
+*.json
+!parcelas_.geojson

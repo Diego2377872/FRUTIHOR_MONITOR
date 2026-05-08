@@ -13,43 +13,33 @@ from datetime import datetime, timedelta
 app = Flask(__name__, static_folder='static', static_url_path='')
 CORS(app)
 
-# ---------- Earth Engine con cuenta de servicio usando JSON completo ----------
+# ---------- Inicialización de Earth Engine (robusta) ----------
+ee_initialized = False
 try:
     json_creds = os.environ.get("EE_CREDENTIALS")
     if json_creds:
-        # Escribir el JSON a un archivo temporal
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
-            f.write(json_creds)
-            key_file = f.name
-        # Cargar las credenciales desde el archivo
-        with open(key_file, 'r') as f:
-            cred_info = json.load(f)
-        credentials = ee.ServiceAccountCredentials(
-            email=cred_info['client_email'],
-            key_file=key_file
-        )
+        # Cargar el JSON como diccionario
+        creds = json.loads(json_creds)
+        private_key = creds["private_key"]
+        client_email = creds["client_email"]
+        # Usar key_data en lugar de archivo
+        credentials = ee.ServiceAccountCredentials(client_email, key_data=private_key)
         ee.Initialize(credentials)
-        print("✅ Conectado a Earth Engine con cuenta de servicio (JSON completo)")
+        print("✅ Conectado a Earth Engine con cuenta de servicio (key_data)")
+        ee_initialized = True
     else:
-        # Fallback para modo local o variables separadas
-        private_key = os.environ.get("EE_PRIVATE_KEY")
-        client_email = os.environ.get("EE_CLIENT_EMAIL")
-        if private_key and client_email:
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
-                json.dump({"private_key": private_key, "client_email": client_email}, f)
-                key_file = f.name
-            credentials = ee.ServiceAccountCredentials(client_email, key_file)
-            ee.Initialize(credentials)
-            print("✅ Conectado a Earth Engine con variables separadas (legacy)")
-        else:
-            ee.Initialize()
-            print("✅ Conectado a Earth Engine en modo local")
+        # Fallback: modo local (desarrollo)
+        ee.Initialize()
+        print("✅ Conectado a Earth Engine en modo local")
+        ee_initialized = True
 except Exception as e:
     print(f"❌ Error en Earth Engine: {e}")
+    print("⚠️ Las funciones de índices satelitales y mapa de heladas no estarán disponibles.")
+    ee_initialized = False
 
 transformer = Transformer.from_crs("epsg:32721", "epsg:4326", always_xy=True)
 
-# Ruta al GeoJSON (debe estar en la misma carpeta que app.py)
+# Ruta al GeoJSON
 PATH_GEOJSON = os.path.join(os.path.dirname(__file__), 'parcelas_.geojson')
 
 # ---------- Base de datos SQLite ----------
@@ -76,7 +66,7 @@ def init_db():
 
 init_db()
 
-# ---------- Servir el frontend ----------
+# ---------- Servir frontend ----------
 @app.route('/')
 def servir_frontend():
     return send_from_directory('static', 'index.html')
@@ -98,14 +88,14 @@ def obtener_parcelas():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ---------- Endpoint: historial climático (30 días) ----------
+# ---------- Endpoint: historial climático ----------
 @app.route('/api/historial_clima', methods=['POST'])
 def obtener_historial_clima():
+    # (mismo código que antes, no necesita EE)
     try:
         req = request.json
         feature = req['feature']
         geom = feature['geometry']
-        
         coords = None
         if geom['type'] == 'Polygon':
             coords = geom['coordinates'][0]
@@ -113,18 +103,14 @@ def obtener_historial_clima():
             coords = geom['coordinates'][0][0]
         else:
             return jsonify({"error": "Geometría no soportada"}), 400
-        
         if not coords or len(coords) < 3:
             return jsonify({"error": "Coordenadas inválidas"}), 400
-        
         lats = [p[1] for p in coords]
         lons = [p[0] for p in coords]
         lat_centro = sum(lats) / len(lats)
         lon_centro = sum(lons) / len(lons)
-        
         end_date = datetime.now() - timedelta(days=1)
         start_date = end_date - timedelta(days=29)
-        
         url = "https://api.open-meteo.com/v1/forecast"
         params = {
             "latitude": lat_centro,
@@ -134,12 +120,10 @@ def obtener_historial_clima():
             "past_days": 30,
             "forecast_days": 0
         }
-        
         response = requests.get(url, params=params)
         data = None
         if response.status_code == 200:
             data = response.json()
-        
         if not data or "daily" not in data or "time" not in data["daily"]:
             url_archive = "https://archive-api.open-meteo.com/v1/archive"
             params_archive = {
@@ -155,22 +139,18 @@ def obtener_historial_clima():
                 data = resp_archive.json()
             else:
                 return jsonify({"error": "No se pudo obtener clima histórico"}), 500
-        
         if "daily" not in data or "time" not in data["daily"]:
             return jsonify({"error": "Formato de respuesta inválido"}), 500
-        
         fechas_totales = data["daily"]["time"]
         temp_max_total = data["daily"]["temperature_2m_max"]
         temp_min_total = data["daily"]["temperature_2m_min"]
         humedad_total = data["daily"]["relative_humidity_2m_mean"]
         precip_total = data["daily"].get("precipitation_sum", [0]*len(fechas_totales))
-        
         fechas_filtradas = []
         temp_max_filt = []
         temp_min_filt = []
         humedad_filt = []
         precip_filt = []
-        
         fecha_inicio_dt = start_date
         for i, fecha_str in enumerate(fechas_totales):
             fecha_dt = datetime.strptime(fecha_str, '%Y-%m-%d')
@@ -180,7 +160,6 @@ def obtener_historial_clima():
                 temp_min_filt.append(temp_min_total[i])
                 humedad_filt.append(humedad_total[i])
                 precip_filt.append(precip_total[i] if i < len(precip_total) else 0)
-        
         return jsonify({
             "fechas": fechas_filtradas,
             "temp_min": temp_min_filt,
@@ -188,14 +167,15 @@ def obtener_historial_clima():
             "humedad": humedad_filt,
             "precipitacion": precip_filt
         })
-        
     except Exception as e:
         print("Error en /api/historial_clima:", str(e))
         return jsonify({"error": str(e)}), 500
 
-# ---------- Endpoint: análisis NDVI / IC / NDWI ----------
+# ---------- Endpoint: análisis NDVI/IC/NDWI (solo si EE está inicializado) ----------
 @app.route('/api/analizar', methods=['POST'])
 def analizar():
+    if not ee_initialized:
+        return jsonify({"error": "Earth Engine no está disponible. Verifica la autenticación."}), 503
     try:
         req = request.json
         feature = req['feature']
@@ -250,11 +230,14 @@ def analizar():
             "desglose": desglose
         })
     except Exception as e:
+        print("Error en /api/analizar:", str(e))
         return jsonify({"error": str(e)}), 500
 
-# ---------- Endpoint: mapa de heladas ----------
+# ---------- Mapa de heladas ----------
 @app.route('/api/mapa_heladas', methods=['POST'])
 def mapa_heladas():
+    if not ee_initialized:
+        return jsonify({"error": "Earth Engine no disponible"}), 503
     try:
         req = request.json
         feature = req['feature']
@@ -274,7 +257,7 @@ def mapa_heladas():
             .sort('system:time_start', False)
         size = collection.size().getInfo()
         if size == 0:
-            return jsonify({"error": "No hay datos de temperatura en los últimos 30 días"}), 404
+            return jsonify({"error": "No hay datos de temperatura en últimos 30 días"}), 404
         imagen = collection.first()
         fecha_imagen = imagen.date().format('YYYY-MM-dd').getInfo()
         temp_c = imagen.subtract(273.15).clip(roi)
@@ -293,9 +276,10 @@ def mapa_heladas():
         print("❌ Error en mapa_heladas:", str(e))
         return jsonify({"error": str(e)}), 500
 
-# ---------- Endpoint: pronóstico 10 días ----------
+# ---------- Pronóstico ----------
 @app.route('/api/pronostico', methods=['POST'])
 def obtener_pronostico():
+    # (mismo código de antes)
     try:
         req = request.json
         feature = req['feature']
@@ -355,9 +339,10 @@ def obtener_pronostico():
         print("Error en /api/pronostico:", str(e))
         return jsonify({"error": str(e)}), 500
 
-# ---------- Endpoint: recomendación ----------
+# ---------- Recomendación ----------
 @app.route('/api/recomendacion', methods=['POST'])
 def recomendacion():
+    # (mismo código)
     try:
         req = request.json
         cultivo = req.get('cultivo', 'tomate')
@@ -415,7 +400,7 @@ def recomendacion():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ---------- Endpoint: Chat con IA (usando Groq) ----------
+# ---------- Chat ----------
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
 @app.route('/api/chat', methods=['POST'])
@@ -424,41 +409,24 @@ def chat():
         data = request.json
         mensaje_usuario = data.get('mensaje')
         historial = data.get('historial', [])
-        
         if not mensaje_usuario:
             return jsonify({"error": "Mensaje vacío"}), 400
-        
         if not GROQ_API_KEY:
-            return jsonify({"error": "API Key de Groq no configurada en el servidor"}), 500
-        
-        # Contexto adicional (cultivo y alerta de helada)
+            return jsonify({"error": "API Key de Groq no configurada"}), 500
         contexto = f"Cultivo: {data.get('cultivo', 'desconocido')}, Heladas pronosticadas: {data.get('alerta_helada', False)}"
-        
         messages = historial + [{"role": "user", "content": f"Contexto: {contexto}\nPregunta: {mensaje_usuario}"}]
-        
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {GROQ_API_KEY}"
-        }
-        payload = {
-            "model": "llama-3.3-70b-versatile",
-            "messages": messages,
-            "temperature": 0.7
-        }
-        
-        response = requests.post("https://api.groq.com/openai/v1/chat/completions", 
-                                 json=payload, headers=headers, timeout=30)
+        headers = {"Content-Type": "application/json", "Authorization": f"Bearer {GROQ_API_KEY}"}
+        payload = {"model": "llama-3.3-70b-versatile", "messages": messages, "temperature": 0.7}
+        response = requests.post("https://api.groq.com/openai/v1/chat/completions", json=payload, headers=headers, timeout=30)
         if response.status_code != 200:
             return jsonify({"error": f"Error de Groq: {response.text}"}), 500
-        
         respuesta = response.json()["choices"][0]["message"]["content"]
         return jsonify({"respuesta": respuesta})
-        
     except Exception as e:
         print("Error en chat:", str(e))
         return jsonify({"error": str(e)}), 500
 
-# ---------- Endpoints: CUADERNO DE CAMPO ----------
+# ---------- Cuaderno de campo ----------
 @app.route('/api/cuaderno', methods=['GET'])
 def obtener_labores():
     parcela_id = request.args.get('parcela_id')
@@ -486,13 +454,9 @@ def guardar_labor():
         INSERT INTO labores (parcela_id, fecha, tipo_labor, insumo, dosis, operario, observaciones)
         VALUES (?, ?, ?, ?, ?, ?, ?)
     ''', (
-        data['parcela_id'],
-        data['fecha'],
-        data['tipo_labor'],
-        data.get('insumo', ''),
-        data.get('dosis', ''),
-        data.get('operario', ''),
-        data.get('observaciones', '')
+        data['parcela_id'], data['fecha'], data['tipo_labor'],
+        data.get('insumo', ''), data.get('dosis', ''),
+        data.get('operario', ''), data.get('observaciones', '')
     ))
     conn.commit()
     nuevo_id = c.lastrowid

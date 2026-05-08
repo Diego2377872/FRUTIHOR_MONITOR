@@ -13,21 +13,37 @@ from datetime import datetime, timedelta
 app = Flask(__name__, static_folder='static', static_url_path='')
 CORS(app)
 
-# ---------- Earth Engine con cuenta de servicio (para Render) ----------
+# ---------- Earth Engine con cuenta de servicio usando JSON completo ----------
 try:
-    private_key = os.environ.get("EE_PRIVATE_KEY")
-    client_email = os.environ.get("EE_CLIENT_EMAIL")
-    if private_key and client_email:
+    json_creds = os.environ.get("EE_CREDENTIALS")
+    if json_creds:
+        # Escribir el JSON a un archivo temporal
         with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
-            f.write(private_key)
+            f.write(json_creds)
             key_file = f.name
-        credentials = ee.ServiceAccountCredentials(client_email, key_file)
+        # Cargar las credenciales desde el archivo
+        with open(key_file, 'r') as f:
+            cred_info = json.load(f)
+        credentials = ee.ServiceAccountCredentials(
+            email=cred_info['client_email'],
+            key_file=key_file
+        )
         ee.Initialize(credentials)
-        print("✅ Conectado a Earth Engine con cuenta de servicio")
+        print("✅ Conectado a Earth Engine con cuenta de servicio (JSON completo)")
     else:
-        # Modo local (requiere autenticación previa con gcloud)
-        ee.Initialize()
-        print("✅ Conectado a Earth Engine en modo local")
+        # Fallback para modo local o variables separadas
+        private_key = os.environ.get("EE_PRIVATE_KEY")
+        client_email = os.environ.get("EE_CLIENT_EMAIL")
+        if private_key and client_email:
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+                json.dump({"private_key": private_key, "client_email": client_email}, f)
+                key_file = f.name
+            credentials = ee.ServiceAccountCredentials(client_email, key_file)
+            ee.Initialize(credentials)
+            print("✅ Conectado a Earth Engine con variables separadas (legacy)")
+        else:
+            ee.Initialize()
+            print("✅ Conectado a Earth Engine en modo local")
 except Exception as e:
     print(f"❌ Error en Earth Engine: {e}")
 

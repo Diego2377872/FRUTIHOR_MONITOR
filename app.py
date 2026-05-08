@@ -7,7 +7,6 @@ import os
 import tempfile
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
-from pyproj import Transformer
 from datetime import datetime, timedelta
 
 app = Flask(__name__, static_folder='static', static_url_path='')
@@ -36,8 +35,6 @@ except Exception as e:
     print(f"❌ Error en Earth Engine: {e}")
     print("⚠️ Las funciones de índices satelitales y mapa de heladas no estarán disponibles.")
     ee_initialized = False
-
-transformer = Transformer.from_crs("epsg:32721", "epsg:4326", always_xy=True)
 
 # Ruta al GeoJSON
 PATH_GEOJSON = os.path.join(os.path.dirname(__file__), 'parcelas_.geojson')
@@ -71,19 +68,17 @@ init_db()
 def servir_frontend():
     return send_from_directory('static', 'index.html')
 
-# ---------- Endpoint: parcelas ----------
+# ---------- Endpoint: parcelas (corregido: sin transformación) ----------
 @app.route('/api/parcelas')
 def obtener_parcelas():
     try:
         with open(PATH_GEOJSON, encoding='utf-8') as f:
             data = json.load(f)
+        # Asegurar que cada feature tenga un campo 'id'
         for feature in data['features']:
-            geom = feature['geometry']
-            if geom['type'] == 'Polygon':
-                coords = geom['coordinates']
-                geom['coordinates'] = [[transformer.transform(x, y) for x, y in ring] for ring in coords]
             if 'id' not in feature:
-                feature['id'] = str(feature.get('properties', {}).get('id', feature.get('id', '')))
+                props = feature.get('properties', {})
+                feature['id'] = str(props.get('id', feature.get('id', '')))
         return jsonify(data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -91,7 +86,6 @@ def obtener_parcelas():
 # ---------- Endpoint: historial climático ----------
 @app.route('/api/historial_clima', methods=['POST'])
 def obtener_historial_clima():
-    # (mismo código que antes, no necesita EE)
     try:
         req = request.json
         feature = req['feature']
@@ -171,7 +165,7 @@ def obtener_historial_clima():
         print("Error en /api/historial_clima:", str(e))
         return jsonify({"error": str(e)}), 500
 
-# ---------- Endpoint: análisis NDVI/IC/NDWI (solo si EE está inicializado) ----------
+# ---------- Endpoint: análisis NDVI/IC/NDWI (corregido: manejo de MultiPolygon) ----------
 @app.route('/api/analizar', methods=['POST'])
 def analizar():
     if not ee_initialized:
@@ -184,7 +178,16 @@ def analizar():
         fecha_target = datetime.strptime(fecha_usuario, '%Y-%m-%d')
         fecha_inicio = (fecha_target - timedelta(days=15)).strftime('%Y-%m-%d')
         fecha_fin = (fecha_target + timedelta(days=5)).strftime('%Y-%m-%d')
-        coords = feature['geometry']['coordinates'][0]
+        
+        # Extraer coordenadas correctamente (Polygon o MultiPolygon)
+        geom = feature['geometry']
+        if geom['type'] == 'Polygon':
+            coords = geom['coordinates'][0]
+        elif geom['type'] == 'MultiPolygon':
+            coords = geom['coordinates'][0][0]
+        else:
+            return jsonify({"error": "Geometría no soportada"}), 400
+
         roi = ee.Geometry.Polygon(coords)
         imagen = (ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
                   .filterBounds(roi)
@@ -233,7 +236,7 @@ def analizar():
         print("Error en /api/analizar:", str(e))
         return jsonify({"error": str(e)}), 500
 
-# ---------- Mapa de heladas ----------
+# ---------- Mapa de heladas (ya correcto, se mantiene) ----------
 @app.route('/api/mapa_heladas', methods=['POST'])
 def mapa_heladas():
     if not ee_initialized:
@@ -279,7 +282,6 @@ def mapa_heladas():
 # ---------- Pronóstico ----------
 @app.route('/api/pronostico', methods=['POST'])
 def obtener_pronostico():
-    # (mismo código de antes)
     try:
         req = request.json
         feature = req['feature']
@@ -342,7 +344,6 @@ def obtener_pronostico():
 # ---------- Recomendación ----------
 @app.route('/api/recomendacion', methods=['POST'])
 def recomendacion():
-    # (mismo código)
     try:
         req = request.json
         cultivo = req.get('cultivo', 'tomate')

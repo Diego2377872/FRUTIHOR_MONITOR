@@ -571,11 +571,11 @@
         const atributosDiv = document.getElementById('parcela-atributos');
         const infoCard = document.getElementById('parcela-info-card');
         
-        // Leer correctamente las columnas "C.I." y "N.Técnic"
+        // Leer correctamente las columnas "C.I." y "N. Técnic"
         currentParcelaData = {
             Productor: props.Nombre || "—",
             Cedula: props["C.I."] || props.C_I || "—",
-            Tecnico: props["N.Técnic"] || props.N_Tecnico || "—",
+            Tecnico: props["N. Técnic"] || props["N.Técnic"] || props.N_Tecnico || "—",
             Rubro: props.Rubro || "—",
             Localidad: props.Localidad || "—"
         };
@@ -583,7 +583,7 @@
         const campos = [
             { key: "Nombre", label: "Productor", icon: "fas fa-user-circle", default: "—" },
             { key: "C.I.", label: "Cédula", icon: "fas fa-id-card", default: "—" },
-            { key: "N.Técnic", label: "Técnico", icon: "fas fa-chalkboard-user", default: "—" },
+            { key: "N. Técnic", label: "Técnico", icon: "fas fa-chalkboard-user", default: "—" },
             { key: "Rubro", label: "Rubro", icon: "fas fa-seedling", default: "—" },
             { key: "Localidad", label: "Localidad", icon: "fas fa-map-pin", default: "—" }
         ];
@@ -813,9 +813,9 @@
             <table style="width:100%; border-collapse:collapse; margin:15px 0; background:#f8f9fa;">
                 <tr><td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Productor</strong></td><td style="padding:8px; border-bottom:1px solid #ddd;">${currentParcelaData.Productor}</td></tr>
                 <tr><td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Cédula</strong></td><td style="padding:8px; border-bottom:1px solid #ddd;">${currentParcelaData.Cedula}</td></tr>
-                <tr><td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Nombre del Técnico</strong></td><td style="padding:8px; border-bottom:1px solid #ddd;">${currentParcelaData.Tecnico}</td></tr>
-                <tr><td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Rubro</strong></td><td style="padding:8px; border-bottom:1px solid #ddd;">${currentParcelaData.Rubro}</td></tr>
-                <tr><td style="padding:8px;"><strong>Localidad</strong></td><td style="padding:8px;">${currentParcelaData.Localidad}</td></tr>
+                <tr><td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Nombre del Técnico</strong></td><td style="padding:8px; border-bottom:1px solid #ddd;">${currentParcelaData.Tecnico}<\/td></tr>
+                <tr><td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Rubro</strong></td><td style="padding:8px; border-bottom:1px solid #ddd;">${currentParcelaData.Rubro}<\/td></tr>
+                <tr><td style="padding:8px;"><strong>Localidad</strong></td><td style="padding:8px;">${currentParcelaData.Localidad}<\/td></tr>
             </table>
         `;
         

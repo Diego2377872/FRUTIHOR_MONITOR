@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FrutihorMonitor PRO | An¨¢lisis T¨¦cnico + Cuaderno de Campo</title>
+    <title>FrutihorMonitor | Análisis Técnico y Heladas + Cuaderno de Campo</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
@@ -11,21 +11,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at 10% 20%, #0a0f1c, #030617);
+            background: #0a0f1c;
             color: #eef2ff;
             height: 100vh;
             display: flex;
             overflow: hidden;
         }
-
         :root {
             --primary: #f97316;
             --primary-dark: #ea580c;
@@ -34,258 +28,170 @@
             --warning: #facc15;
             --success: #22c55e;
             --sidebar-width: 460px;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
-            --card-bg: rgba(15, 23, 42, 0.75);
+            --glass: rgba(255, 255, 255, 0.02);
+            --border: rgba(255, 255, 255, 0.06);
         }
-
-        ::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #f97316;
-            border-radius: 10px;
-        }
-
         .sidebar {
             width: var(--sidebar-width);
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
+            background: #0f172ad9;
+            backdrop-filter: blur(16px);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             z-index: 1000;
-            box-shadow: 8px 0 32px rgba(0, 0, 0, 0.4);
         }
-
         .header {
-            padding: 28px 24px;
-            background: linear-gradient(135deg, #1e293bc9, #0f172ae6);
+            padding: 24px 24px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
             border-bottom: 1px solid var(--border);
         }
         .header h2 {
-            font-size: 1.5rem;
-            font-weight: 800;
+            font-size: 1.4rem;
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 12px;
-            letter-spacing: -0.3px;
         }
         .header h2 img {
-            height: 30px;
+            height: 50px;
             width: auto;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 0 2px rgba(0,0,0,0.3));
         }
-        .header p {
-            font-size: 0.7rem;
-            color: #94a3b8;
-            margin-top: 8px;
-            letter-spacing: 0.3px;
-        }
-
         .content {
-            padding: 24px 20px;
+            padding: 20px;
             flex: 1;
             overflow-y: auto;
             scrollbar-width: thin;
         }
-
         .section-title {
             font-size: 0.7rem;
-            font-weight: 700;
+            font-weight: 600;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin: 28px 0 12px 6px;
+            letter-spacing: 1px;
+            margin: 20px 0 12px 5px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-
         .control-card, .metric-card, .chart-card {
-            background: rgba(30, 41, 59, 0.45);
+            background: rgba(30, 41, 59, 0.5);
             border: 1px solid var(--border);
-            border-radius: 28px;
-            backdrop-filter: blur(8px);
-            transition: all 0.2s ease;
-        }
-        .control-card:hover, .metric-card:hover, .chart-card:hover {
-            border-color: rgba(249, 115, 22, 0.4);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            border-radius: 24px;
+            backdrop-filter: blur(4px);
         }
         .chart-card {
-            padding: 16px 0px 12px 0px;
+            padding: 15px 0px 10px 0px;
             position: relative;
         }
         .chart-header {
             display: flex;
             justify-content: flex-end;
             gap: 8px;
-            padding: 0 18px 12px 0;
+            padding: 0 15px 10px 0;
         }
         .download-chart-btn {
             background: #1e293b;
             border: 1px solid var(--border);
             color: #cbd5e1;
-            padding: 6px 14px;
-            border-radius: 40px;
+            padding: 5px 10px;
+            border-radius: 20px;
             font-size: 0.7rem;
-            font-weight: 500;
             cursor: pointer;
             transition: 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         .download-chart-btn:hover {
             background: var(--primary);
             color: #0f172a;
-            border-color: var(--primary);
-            transform: translateY(-1px);
         }
-
-        #forecast-chart, #climate-chart {
-            height: 360px;
-            width: 100%;
-            margin-top: 8px;
-        }
-        .chart-container {
-            height: 360px;
-            width: 100%;
-        }
-
         .metric-card {
-            background: linear-gradient(145deg, #1e293bcc, #0f172acc);
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
             padding: 20px;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.3);
-            border-radius: 28px;
         }
-
-        label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #cbd5e1;
-            margin-bottom: 6px;
-            display: block;
-            letter-spacing: 0.3px;
-        }
+        label { font-size: 0.7rem; font-weight: 500; color: #94a3b8; margin-bottom: 6px; display: block; }
         input, select {
             width: 100%;
             background: #0f172a;
             border: 1px solid var(--border);
-            padding: 12px 14px;
-            border-radius: 20px;
+            padding: 10px 12px;
+            border-radius: 14px;
             color: white;
-            font-family: 'Inter', sans-serif;
+            font-family: inherit;
             font-size: 0.85rem;
-            margin-bottom: 16px;
-            transition: 0.2s;
+            margin-bottom: 14px;
         }
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(249,115,22,0.2);
-        }
-
-        .mode-selector {
-            display: flex;
-            gap: 10px;
-            margin: 12px 0 6px;
-        }
+        .mode-selector { display: flex; gap: 8px; margin: 8px 0 4px; }
         .mode-btn {
             flex: 1;
             border: none;
-            padding: 10px 4px;
-            border-radius: 40px;
-            font-weight: 700;
+            padding: 8px;
+            border-radius: 12px;
+            font-weight: 600;
             font-size: 0.75rem;
             cursor: pointer;
             background: #1e293b;
             color: #cbd5e1;
             transition: 0.2s;
         }
-        .mode-btn.active {
-            background: var(--primary);
-            color: #0f172a;
-            box-shadow: 0 2px 8px rgba(249,115,22,0.4);
-        }
-
+        .mode-btn.active { background: var(--primary); color: #0f172a; }
         .forecast-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(108px,1fr));
-            gap: 12px;
-            margin-top: 20px;
-            padding: 0 12px;
+            grid-template-columns: repeat(auto-fill, minmax(105px,1fr));
+            gap: 10px;
+            margin-top: 16px;
+            padding: 0 8px;
         }
         .forecast-box {
-            background: rgba(0,0,0,0.35);
+            background: rgba(0,0,0,0.3);
             border: 1px solid var(--border);
-            padding: 12px 6px;
-            border-radius: 20px;
+            padding: 10px;
+            border-radius: 16px;
             text-align: center;
             font-size: 0.75rem;
-            transition: 0.2s;
         }
         .forecast-box.helada {
             border-color: var(--danger);
-            background: rgba(239,68,68,0.2);
-            box-shadow: 0 0 6px rgba(239,68,68,0.3);
+            background: rgba(239,68,68,0.15);
         }
-        .forecast-box b {
-            font-size: 1rem;
-            display: block;
-            margin: 8px 0;
-        }
+        .forecast-box b { font-size: 1rem; display: block; margin: 6px 0; }
         .helada-warning {
-            background: rgba(239,68,68,0.18);
+            background: rgba(239,68,68,0.2);
             border-left: 4px solid var(--danger);
-            padding: 14px;
-            border-radius: 20px;
-            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 16px;
+            margin-bottom: 18px;
             font-weight: 600;
             display: flex;
-            gap: 14px;
+            gap: 12px;
             align-items: center;
-            backdrop-filter: blur(4px);
         }
-
         .btn-excel {
             width: 100%;
             background: var(--primary);
             color: #0f172a;
             border: none;
-            padding: 14px;
-            border-radius: 32px;
-            font-weight: 800;
-            font-size: 0.85rem;
-            margin-top: 28px;
+            padding: 12px;
+            border-radius: 16px;
+            font-weight: 700;
+            margin-top: 24px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            transition: 0.2s;
         }
-        .btn-excel:hover {
-            background: #ff8c42;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(249,115,22,0.3);
-        }
-
+        .btn-excel:hover { background: #ff8c42; transform: translateY(-2px); }
         .toggle-labels-btn {
             position: absolute;
-            top: 12px;
-            left: 12px;
+            top: 8px;
+            left: 8px;
             background: #1e293b;
             border: 1px solid var(--border);
             color: #cbd5e1;
-            width: 34px;
-            height: 34px;
-            border-radius: 12px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             font-size: 0.9rem;
             cursor: pointer;
             z-index: 100;
@@ -298,194 +204,196 @@
             background: var(--primary);
             color: #0f172a;
         }
-
-        #map {
-            flex: 1;
-            background: #020617;
-            border-radius: 0;
-        }
-
+        #map { flex: 1; background: #020617; }
         .loading-overlay {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            background: #0f172aee;
-            backdrop-filter: blur(8px);
-            padding: 8px 20px;
+            position: absolute; top: 20px; right: 20px;
+            background: #0f172a;
+            padding: 10px 20px;
             border-radius: 40px;
             border-left: 3px solid var(--primary);
             display: none;
             z-index: 2000;
             font-weight: 500;
             font-size: 0.8rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-
         .recomendacion-card {
             background: #0f172a;
-            border-radius: 24px;
-            padding: 18px;
-            margin-top: 20px;
+            border-radius: 20px;
+            padding: 16px;
+            margin-top: 16px;
             border: 1px solid var(--border);
             font-size: 0.8rem;
             line-height: 1.5;
-            transition: 0.2s;
         }
-        .recomendacion-card:hover {
-            border-color: var(--primary);
-        }
-
         .progress-bar {
-            background: #1e293b;
-            border-radius: 40px;
+            background: #334155;
+            border-radius: 20px;
             height: 8px;
             overflow: hidden;
-            margin: 10px 0;
+            margin: 8px 0;
         }
         .progress-fill {
             height: 100%;
-            border-radius: 40px;
-            transition: width 0.3s;
+            border-radius: 20px;
         }
-
         #chat-button {
-            position: fixed; bottom: 28px; right: 28px;
-            width: 58px; height: 58px;
+            position: fixed; bottom: 25px; right: 25px;
+            width: 55px; height: 55px;
             background: var(--primary);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; z-index: 1200;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            transition: 0.2s;
-        }
-        #chat-button:hover {
-            transform: scale(1.05);
-            background: #ff8c42;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
         #chat-window {
-            position: fixed; bottom: 100px; right: 28px;
-            width: 400px; height: 580px;
-            background: #121826ee;
-            backdrop-filter: blur(16px);
-            border-radius: 28px;
+            position: fixed; bottom: 90px; right: 25px;
+            width: 380px; height: 550px;
+            background: #1e293b;
+            border-radius: 24px;
             display: flex; flex-direction: column;
             z-index: 1200;
-            transform: translateY(25px);
+            transform: translateY(20px);
             opacity: 0;
             pointer-events: none;
-            transition: 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            transition: 0.2s;
             border: 1px solid var(--border);
-            box-shadow: 0 20px 35px rgba(0,0,0,0.5);
         }
-        #chat-window.open {
-            transform: translateY(0);
-            opacity: 1;
-            pointer-events: all;
-        }
+        #chat-window.open { transform: translateY(0); opacity: 1; pointer-events: all; }
         .chat-header {
-            padding: 18px;
+            padding: 15px;
             display: flex; justify-content: space-between;
             background: #0f172a;
             border-bottom: 1px solid var(--border);
-            border-radius: 28px 28px 0 0;
-            font-weight: 700;
+            border-radius: 24px 24px 0 0;
+            font-weight: 600;
         }
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .user-message {
-            background: var(--primary);
-            color: #0f172a;
-            align-self: flex-end;
-            border-radius: 24px 24px 4px 24px;
-            padding: 10px 16px;
-            max-width: 80%;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-        .bot-message {
-            background: #2d3748;
-            align-self: flex-start;
-            border-radius: 24px 24px 24px 4px;
-            padding: 10px 16px;
-            max-width: 80%;
-            font-size: 0.8rem;
-        }
-        .chat-input-area {
-            display: flex;
-            padding: 14px;
-            gap: 10px;
-            background: #0f172a;
-            border-top: 1px solid var(--border);
-            border-radius: 0 0 28px 28px;
-        }
-        .chat-input-area input {
-            flex: 1;
+        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .user-message { background: var(--primary); color: white; align-self: flex-end; border-radius: 20px 20px 4px 20px; padding: 10px 14px; max-width: 80%; font-size: 0.8rem; }
+        .bot-message { background: #2d3748; align-self: flex-start; border-radius: 20px 20px 20px 4px; padding: 10px 14px; max-width: 80%; font-size: 0.8rem; }
+        .chat-input-area { display: flex; padding: 12px; gap: 8px; background: #0f172a; border-top: 1px solid var(--border); }
+        .chat-input-area input { flex: 1; background: #1e293b; border: none; padding: 10px; border-radius: 30px; color: white; font-size: 0.8rem; }
+        .chat-input-area button { background: var(--primary); border: none; padding: 0 20px; border-radius: 30px; font-weight: bold; cursor: pointer; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        #modal-cuaderno input, #modal-cuaderno select, #modal-cuaderno textarea {
             background: #1e293b;
-            border: none;
-            padding: 12px 16px;
-            border-radius: 40px;
+            border: 1px solid #334155;
+            border-radius: 14px;
+            padding: 10px;
             color: white;
+        }
+        .labor-item {
+            background: #1e293b;
+            border-left: 3px solid var(--primary);
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 16px;
             font-size: 0.8rem;
         }
-        .chat-input-area button {
-            background: var(--primary);
-            border: none;
-            padding: 0 24px;
-            border-radius: 40px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
+        .labor-item .fecha { color: var(--primary); font-weight: bold; }
+        .labor-actions { text-align: right; margin-top: 8px; }
+        .labor-actions button { background: none; border: none; color: #ef4444; cursor: pointer; }
+        .chart-wrapper {
+            overflow-x: auto;
+            width: 100%;
+        }
+        .chart-container {
+            min-width: 100%;
+            height: 300px;
+        }
+        .climate-chart-container {
+            height: 300px;
+        }
+        .echarts-tooltip {
+            z-index: 9999 !important;
         }
         .chat-download-btn {
             background: none;
             border: none;
             color: #cbd5e1;
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1rem;
             margin-right: 12px;
-            transition: 0.2s;
         }
-        .chat-download-btn:hover {
+        .chat-download-btn:hover { color: var(--primary); }
+        /* Tarjeta de atributos de parcela */
+        .parcela-info-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 24px;
+            padding: 16px;
+            margin-top: 20px;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+        }
+        .parcela-info-card .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(249, 115, 22, 0.5);
+        }
+        .parcela-info-card .card-header i {
+            font-size: 1.4rem;
             color: var(--primary);
-            transform: scale(1.05);
+            background: rgba(249, 115, 22, 0.2);
+            padding: 8px;
+            border-radius: 16px;
         }
-
-        #modal-cuaderno input, #modal-cuaderno select, #modal-cuaderno textarea {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 20px;
-            padding: 10px 14px;
-            color: white;
+        .parcela-info-card .card-header h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0;
+            color: #f8fafc;
+            letter-spacing: 0.5px;
         }
-        .labor-item {
-            background: #1e293b;
-            border-left: 4px solid var(--primary);
-            padding: 14px;
-            margin-bottom: 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            transition: 0.1s;
+        .parcela-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
         }
-        .labor-item .fecha {
+        .info-item {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 16px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .info-item:hover {
+            background: rgba(249, 115, 22, 0.15);
+            transform: translateY(-2px);
+        }
+        .info-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(249, 115, 22, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
             color: var(--primary);
-            font-weight: bold;
         }
-        .labor-actions {
-            text-align: right;
-            margin-top: 10px;
+        .info-content {
+            flex: 1;
         }
-        .labor-actions button {
-            background: none;
-            border: none;
-            color: #ef4444;
-            cursor: pointer;
-            font-size: 0.75rem;
+        .info-label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #94a3b8;
+            margin-bottom: 2px;
+        }
+        .info-value {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            word-break: break-word;
         }
     </style>
 </head>
@@ -493,139 +401,144 @@
 <div id="loading" class="loading-overlay"><i class="fas fa-sync-alt fa-spin"></i> Procesando datos...</div>
 <div class="sidebar">
     <div class="header">
-        <h2><img src="logo.png" alt="Logo" onerror="this.style.display='none'">FrutihorMonitor <span style="color:var(--primary)">PRO</span></h2>
-        <p>Monitoreo de precisi¨®n ¡¤ Cultivos frutihorticolas</p>
+        <h2>
+            <img src="logo.png" alt="FrutihorMonitor Logo">
+            FrutihorMonitor <span style="color:var(--primary)">PRO</span>
+        </h2>
+        <p style="font-size: 10px; margin-top: 4px;">Monitoreo de precisión en cultivos frutihorticolas</p>
     </div>
     <div class="content">
-        <div class="control-card" style="padding: 20px;">
+        <div class="control-card">
             <label><i class="fas fa-seedling"></i> CULTIVO</label>
             <select id="cultivo-select">
                 <option value="tomate">?? Tomate (Solanum lycopersicum)</option>
                 <option value="cebolla">?? Cebolla (Allium cepa)</option>
                 <option value="papa">?? Papa (Solanum tuberosum)</option>
             </select>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                 <div><label>?? SIEMBRA</label><input type="date" id="fecha-siembra"></div>
                 <div><label>??? MONITOREO</label><input type="date" id="fecha-input"></div>
             </div>
-            <label>??? VARIEDAD / H¨ªBRIDO</label>
-            <input type="text" id="nombre-variedad" placeholder="Ej: Elpida, Valero, Spunta">
-            <label>?? ¨ªNDICE DE AN¨¢LISIS</label>
+            <label>??? VARIEDAD / HÍBRIDO</label><input type="text" id="nombre-variedad" placeholder="Ej: Elpida, Valero, Spunta">
+            <label>?? ÍNDICE DE ANÁLISIS</label>
             <div class="mode-selector">
                 <button class="mode-btn active" onclick="setModo('NDVI',this)">NDVI</button>
                 <button class="mode-btn" onclick="setModo('IC',this)">IC</button>
                 <button class="mode-btn" onclick="setModo('NDWI',this)">NDWI</button>
             </div>
-            <button id="toggle-frost-btn" style="margin-top: 18px; background:#1e293b; border:1px solid var(--accent); padding:10px; border-radius:40px; width:100%; cursor:pointer; transition:0.2s;"><i class="fas fa-temperature-low"></i> Mapa de heladas (¨²ltima noche)</button>
+            <button id="toggle-frost-btn" style="margin-top: 16px; background:#1e293b; border:1px solid var(--accent); padding:8px; border-radius:14px; width:100%; cursor:pointer;"><i class="fas fa-temperature-low"></i> Mostrar mapa de heladas (última noche)</button>
+        </div>
+
+        <!-- TARJETA DE ATRIBUTOS DE LA PARCELA -->
+        <div id="parcela-info-card" class="parcela-info-card">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <i class="fas fa-map-marker-alt" style="color: var(--primary);"></i>
+                <strong style="font-size: 0.8rem;"></strong>
+            </div>
+            <div id="parcela-atributos"></div>
         </div>
 
         <div id="helada-banner-container"></div>
 
         <span class="section-title"><i class="fas fa-chart-simple"></i> ESTADO DEL CULTIVO</span>
-        <div id="result-container" class="metric-card"><div style="text-align:center; padding:30px;">??? Seleccione una parcela en el mapa</div></div>
+        <div id="result-container" class="metric-card"><div style="text-align:center; padding:20px;">??? Seleccione una parcela en el mapa</div></div>
 
-        <span class="section-title"><i class="fas fa-robot"></i> RECOMENDACI¨®N INTELIGENTE</span>
+        <span class="section-title"><i class="fas fa-robot"></i> RECOMENDACIÓN INTELIGENTE</span>
         <div id="recomendacion-container" class="recomendacion-card">?? Selecciona parcela y fecha de siembra.</div>
 
-        <span class="section-title"><i class="fas fa-cloud-moon-rain"></i> PRON¨®STICO AGROCLIM¨¢TICO (10 D¨ªAS)</span>
+        <span class="section-title"><i class="fas fa-cloud-moon-rain"></i> PRONÓSTICO AGROCLIMÁTICO (10 DÍAS)</span>
         <div class="chart-card">
             <div class="chart-header">
-                <button id="download-forecast-chart" class="download-chart-btn"><i class="fas fa-download"></i> Descargar gr¨¢fico</button>
+                <button id="download-forecast-chart" class="download-chart-btn"><i class="fas fa-download"></i> Descargar gráfico</button>
             </div>
             <button id="toggle-forecast-labels" class="toggle-labels-btn"><i class="fas fa-tag"></i></button>
-            <div id="forecast-chart" class="chart-container"></div>
-            <div id="forecast-error-msg" style="color:#ef4444; text-align:center; font-size:0.75rem; padding:10px; display:none;"></div>
+            <div class="chart-wrapper">
+                <div id="forecast-chart" class="chart-container"></div>
+            </div>
+            <div id="forecast-error-msg" style="color:#ef4444; text-align:center; font-size:0.8rem; padding:10px; display:none;"></div>
             <div class="forecast-grid" id="forecast-data-boxes"></div>
         </div>
 
-        <span class="section-title"><i class="fas fa-temperature-high"></i> HISTORIAL AGROCLIM¨¢TICO (30 D¨ªAS)</span>
+        <span class="section-title"><i class="fas fa-temperature-high"></i> HISTORIAL AGROCLIMÁTICO (30 DÍAS)</span>
         <div class="chart-card">
             <div class="chart-header">
-                <button id="download-climate-chart" class="download-chart-btn"><i class="fas fa-download"></i> Descargar gr¨¢fico</button>
+                <button id="download-climate-chart" class="download-chart-btn"><i class="fas fa-download"></i> Descargar gráfico</button>
             </div>
             <button id="toggle-climate-labels" class="toggle-labels-btn"><i class="fas fa-tag"></i></button>
-            <div id="climate-chart" class="chart-container"></div>
+            <div class="chart-wrapper">
+                <div id="climate-chart" class="chart-container climate-chart-container"></div>
+            </div>
         </div>
 
-        <button onclick="exportarExcel()" class="btn-excel"><i class="fas fa-file-excel"></i> EXPORTAR REPORTE T¨¦CNICO</button>
-        <button id="btn-cuaderno" class="btn-excel" style="background: #2c3e66; margin-top: 16px;"><i class="fas fa-book-open"></i> CUADERNO DE CAMPO</button>
-        <p style="text-align:center; font-size:9px; margin-top:28px; color:#475569;">Desarrollado por NABLA CONSULTORES S.R.L</p>
+        <button id="btn-excel-report" class="btn-excel"><i class="fas fa-file-excel"></i> EXPORTAR REPORTE TÉCNICO</button>
+        <button id="btn-cuaderno" class="btn-excel" style="background: #2c3e66; margin-top: 16px;">
+            <i class="fas fa-book-open"></i> CUADERNO DE CAMPO
+        </button>
+        <p style="text-align:center; font-size:9px; margin-top:20px; color:#475569;">Desarrollado por NABLA CONSULTORES S.R.L</p>
     </div>
 </div>
 <div id="map"></div>
-<div id="chat-button"><i class="fas fa-comment-dots fa-lg"></i></div>
+<div id="chat-button"><i class="fas fa-comment-dots"></i></div>
 <div id="chat-window">
     <div class="chat-header">
-        <span><i class="fas fa-brain"></i> Tom ¡¤ Asesor Agron¨®mico</span>
+        <span><i class="fas fa-brain"></i> Tom · Asesor Agronómico</span>
         <div>
-            <button id="export-chat-pdf-btn" class="chat-download-btn" title="Exportar historial del chat a PDF"><i class="fas fa-file-pdf"></i></button>
-            <button onclick="toggleChat()" style="background:none; border:none; color:#cbd5e1; font-size:1.2rem;">?</button>
+            <button id="export-chat-pdf-btn" class="chat-download-btn" title="Exportar chat a PDF"><i class="fas fa-file-pdf"></i></button>
+            <button onclick="toggleChat()">?</button>
         </div>
     </div>
-    <div class="chat-messages" id="chat-messages">
-        <div class="bot-message">?? Hola, soy Tom. Selecciona una parcela, ingresa la fecha de siembra y analizar¨¦ ¨ªndices satelitales, fenolog¨ªa y pron¨®stico. Tambi¨¦n puedes pedirme: "genera un reporte pdf" o "exportar historial".</div>
-    </div>
-    <div class="chat-input-area">
-        <input id="chat-input" placeholder="Ej: ?C¨®mo proteger del fr¨ªo?" onkeypress="if(event.key==='Enter')sendMessage()">
-        <button onclick="sendMessage()">Enviar</button>
-    </div>
+    <div class="chat-messages" id="chat-messages"><div class="bot-message">?? Hola, soy Tom. Selecciona una parcela, ingresa la fecha de siembra y podré analizar índices satelitales, estadio fenológico y pronóstico para darte recomendaciones precisas. También puedes pedirme: "genera un reporte pdf" o "exportar a pdf".</div></div>
+    <div class="chat-input-area"><input id="chat-input" placeholder="Ej: ¿Cómo proteger del frío?" onkeypress="if(event.key==='Enter')sendMessage()"><button onclick="sendMessage()">Enviar</button></div>
 </div>
 
-<div id="modal-cuaderno" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); z-index:2000; align-items:center; justify-content:center;">
-    <div style="background:#0f172a; border-radius:36px; width:90%; max-width:720px; max-height:85vh; overflow-y:auto; padding:24px; border:1px solid var(--border);">
-        <div style="display:flex; justify-content:space-between; margin-bottom:24px;">
+<div id="modal-cuaderno" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; align-items:center; justify-content:center;">
+    <div style="background:#0f172a; border-radius:28px; width:90%; max-width:700px; max-height:85vh; overflow-y:auto; padding:20px; border:1px solid var(--border);">
+        <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
             <h3><i class="fas fa-clipboard-list"></i> Cuaderno de Campo</h3>
-            <button id="close-modal" style="background:none; border:none; color:white; font-size:28px; cursor:pointer;">&times;</button>
+            <button id="close-modal" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">&times;</button>
         </div>
-        <div id="parcela-info" style="margin-bottom:24px; font-size:0.9rem; background:#1e293b; padding:14px; border-radius:24px;"></div>
+        <div id="parcela-info" style="margin-bottom:20px; font-size:0.9rem; background:#1e293b; padding:12px; border-radius:20px;"></div>
         <form id="form-labor">
             <input type="hidden" id="parcela-id-input">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                 <div><label>?? Fecha</label><input type="date" id="labor-fecha" required></div>
                 <div><label>????? Operario</label><input type="text" id="labor-operario" placeholder="Nombre"></div>
                 <div><label>?? Tipo de labor</label><select id="labor-tipo" required>
-                    <option value="Preparaci¨®n del suelo">Preparaci¨®n del suelo</option>
+                    <option value="Preparación del suelo">Preparación del suelo</option>
                     <option value="Siembra">Siembra</option>
-                    <option value="Fertilizaci¨®n">Fertilizaci¨®n</option>
+                    <option value="Fertilización">Fertilización</option>
                     <option value="Riego">Riego</option>
-                    <option value="Aplicaci¨®n fitosanitaria">Aplicaci¨®n fitosanitaria</option>
+                    <option value="Aplicación fitosanitaria">Aplicación fitosanitaria</option>
                     <option value="Control de malezas">Control de malezas</option>
                     <option value="Cosecha">Cosecha</option>
                     <option value="Otra">Otra</option>
                 </select></div>
-                <div><label>?? Insumo</label><input type="text" id="labor-insumo" placeholder="Ej: Urea"></div>
-                <div><label>?? Dosis</label><input type="text" id="labor-dosis" placeholder="Ej: 150 kg/ha"></div>
-                <div style="grid-column:span 2;"><label>?? Observaciones</label><textarea id="labor-obs" rows="2" style="width:100%; background:#1e293b; border:1px solid var(--border); border-radius:20px; padding:10px;"></textarea></div>
+                <div><label>?? Insumo</label><input type="text" id="labor-insumo" placeholder="Ej: Urea, Glifosato..."></div>
+                <div><label>?? Dosis / Cantidad</label><input type="text" id="labor-dosis" placeholder="Ej: 150 kg/ha"></div>
+                <div style="grid-column:span 2;"><label>?? Observaciones</label><textarea id="labor-obs" rows="2" style="width:100%; background:#1e293b; border:1px solid var(--border); border-radius:14px; padding:8px;"></textarea></div>
             </div>
-            <button type="submit" style="background:var(--primary); width:100%; margin-top:24px; padding:14px; border-radius:40px; font-weight:800;">?? Guardar registro</button>
+            <button type="submit" style="background:var(--primary); width:100%; margin-top:20px; padding:12px; border-radius:24px; font-weight:bold;">?? Guardar registro</button>
         </form>
-        <hr style="margin:24px 0; border-color:var(--border);">
+        <hr style="margin:20px 0; border-color:var(--border);">
         <h4><i class="fas fa-history"></i> Registros anteriores</h4>
-        <div id="lista-labores" style="max-height:300px; overflow-y:auto; margin-top:16px;"></div>
-        <div style="display:flex; gap:16px; margin-top:24px;">
-            <button id="export-excel-cuaderno" class="btn-excel" style="background:#2ecc71;">?? Exportar Excel</button>
-            <button id="export-pdf-cuaderno" class="btn-excel" style="background:#e67e22;">??? Exportar PDF</button>
+        <div id="lista-labores" style="max-height:300px; overflow-y:auto; margin-top:12px;"></div>
+        <div style="display:flex; gap:12px; margin-top:20px;">
+            <button id="export-excel-cuaderno" class="btn-excel" style="background:#2ecc71;">?? Exportar Reporte en Excel</button>
+            <button id="export-pdf-cuaderno" class="btn-excel" style="background:#e67e22;">??? Exportar Reporte en PDF</button>
         </div>
     </div>
 </div>
 
 <script>
-    // Paleta de colores t¨¦cnica
-    const COLORS = {
-        PRECIP: '#2c7da0',
-        TEMP_MIN: '#2ecc71',
-        TEMP_MAX: '#e67e22',
-        HUMEDAD: '#f1c40f',
-        BALANCE: '#16a085'
-    };
-
+    // ---------- PALETA DE COLORES ----------
+    const COLORS = { PRECIP: '#2c7da0', TEMP_MIN: '#2ecc71', TEMP_MAX: '#e67e22', HUMEDAD: '#f1c40f', BALANCE: '#16a085' };
+    
     // ---------- MAPA ----------
     var map = L.map('map').setView([-25.3, -57.5], 11);
-    var googleSat = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { attribution: 'Google Sat¨¦lite', maxZoom: 20 });
-    var esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Esri', maxZoom: 19 });
-    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OSM', maxZoom: 19 });
-    googleSat.addTo(map);
-    L.control.layers({ "??? Google Sat¨¦lite": googleSat, "?? ESRI Sat¨¦lite": esriSat, "?? OpenStreetMap": osm }, null, { position: 'topright' }).addTo(map);
+    var googleSat = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { attribution: 'Google Satélite', maxZoom: 20 }).addTo(map);
+    var esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri', maxZoom: 19 });
+    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 });
+    L.control.layers({ "??? Google Satélite": googleSat, "?? ESRI Satélite": esriSat, "?? OpenStreetMap": osm }, null, { position: 'topright' }).addTo(map);
     
     var frostLayer = null;
     var currentFeature = null;
@@ -634,103 +547,77 @@
     var historial = [];
     let currentParcelaId = null;
     let currentParcelaNombre = "";
-    window.satLayerActual = null;
-
+    let currentParcelaData = {};
+    
     document.getElementById('fecha-input').valueAsDate = new Date();
     document.getElementById('fecha-siembra').valueAsDate = new Date(Date.now() - 45*86400000);
-
+    
+    // Gráficos
     var climateChart = echarts.init(document.getElementById('climate-chart'), 'dark');
     var forecastChart = echarts.init(document.getElementById('forecast-chart'), 'dark');
     let showLabels = false;
-
-    const tooltipConfig = {
-        trigger: 'axis',
-        axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(249,115,22,0.1)' } },
-        backgroundColor: 'rgba(15, 23, 42, 0.96)',
-        borderColor: '#f97316',
-        borderWidth: 2,
-        borderRadius: 12,
-        textStyle: { color: '#fff', fontSize: 11, fontFamily: 'Inter' },
-        formatter: function(params) {
-            let result = `<strong style="color:#f97316">${params[0].axisValue}</strong><br>`;
-            params.forEach(p => {
-                let unit = '';
-                if (p.seriesName.includes('Precipitaci¨®n')) unit = ' mm';
-                else if (p.seriesName.includes('Balance')) unit = ' mm';
-                else if (p.seriesName.includes('Temperatura')) unit = ' ¡ãC';
-                else if (p.seriesName.includes('Humedad')) unit = ' %';
-                result += `<span style="display:inline-block;margin-right:8px;border-radius:10px;width:10px;height:10px;background-color:${p.color};"></span> ${p.seriesName}: <b>${p.value}${unit}</b><br>`;
-            });
-            return result;
-        }
-    };
-
-    const legendBottom = {
-        orient: 'horizontal',
-        left: 'center',
-        bottom: 0,
-        textStyle: { color: '#cbd5e1', fontSize: 9 },
-        itemWidth: 25,
-        itemHeight: 2,
-        icon: 'rect'
-    };
-
-    function getLabelConfig() {
-        return {
-            show: showLabels,
-            position: 'top',
-            color: '#ffffff',
-            fontSize: 9,
-            fontWeight: '600',
-            backgroundColor: 'rgba(15,23,42,0.8)',
-            padding: [2, 5, 2, 5],
-            borderRadius: 6
-        };
-    }
-
+    const tooltipConfig = { trigger: 'axis', axisPointer: { type: 'shadow' }, backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: '#f97316', borderWidth: 2, textStyle: { color: '#fff', fontSize: 12 } };
+    const legendBottom = { orient: 'horizontal', left: 'center', bottom: 0, textStyle: { color: '#cbd5e1', fontSize: 10 }, itemWidth: 25, itemHeight: 2, icon: 'rect' };
+    function getLabelConfig() { return { show: showLabels, position: 'top', color: '#fff', fontSize: 10, fontWeight: '600', backgroundColor: 'rgba(15,23,42,0.7)', padding: [2,5,2,5], borderRadius: 6 }; }
     function updateLabelsVisibility() {
-        let optF = forecastChart.getOption();
-        if (optF.series) { optF.series.forEach(s => s.label = getLabelConfig()); forecastChart.setOption(optF, false); }
-        let optC = climateChart.getOption();
-        if (optC.series) { optC.series.forEach(s => s.label = getLabelConfig()); climateChart.setOption(optC, false); }
+        let opt = forecastChart.getOption();
+        if (opt.series) { opt.series.forEach(s => s.label = getLabelConfig()); forecastChart.setOption(opt, false); }
+        opt = climateChart.getOption();
+        if (opt.series) { opt.series.forEach(s => s.label = getLabelConfig()); climateChart.setOption(opt, false); }
     }
-
     document.getElementById('toggle-forecast-labels').addEventListener('click', () => { showLabels = !showLabels; updateLabelsVisibility(); });
     document.getElementById('toggle-climate-labels').addEventListener('click', () => { showLabels = !showLabels; updateLabelsVisibility(); });
-
-    async function downloadChartWithFooter(chart, filename) {
-        const canvas = await new Promise(resolve => {
-            chart.setOption({ animation: false });
-            setTimeout(() => resolve(chart.getRenderedCanvas()), 80);
-            setTimeout(() => chart.setOption({ animation: true }), 150);
-        });
-        const footerHeight = 42;
-        const newCanvas = document.createElement('canvas');
-        newCanvas.width = canvas.width;
-        newCanvas.height = canvas.height + footerHeight;
-        const ctx = newCanvas.getContext('2d');
-        ctx.drawImage(canvas, 0, 0);
-        ctx.fillStyle = '#0f172a';
-        ctx.fillRect(0, canvas.height, newCanvas.width, footerHeight);
-        ctx.font = '11px "Inter", Arial';
-        ctx.fillStyle = '#94a3b8';
-        ctx.textAlign = 'center';
-        ctx.fillText('* Generado por FrutihorMonitor de NABLA CONSULTORES S.R.L', newCanvas.width/2, canvas.height + 28);
-        const link = document.createElement('a');
-        link.download = `${filename}.png`;
-        link.href = newCanvas.toDataURL();
-        link.click();
-    }
-
-    document.getElementById('download-forecast-chart').addEventListener('click', () => downloadChartWithFooter(forecastChart, 'pronostico_frutihor'));
-    document.getElementById('download-climate-chart').addEventListener('click', () => downloadChartWithFooter(climateChart, 'historial_climatico_frutihor'));
-
+    document.getElementById('download-forecast-chart').addEventListener('click', () => { const url = forecastChart.getDataURL({ type: 'png', pixelRatio: 2 }); const link = document.createElement('a'); link.download = 'pronostico_frutihor.png'; link.href = url; link.click(); });
+    document.getElementById('download-climate-chart').addEventListener('click', () => { const url = climateChart.getDataURL({ type: 'png', pixelRatio: 2 }); const link = document.createElement('a'); link.download = 'historial_climatico_frutihor.png'; link.href = url; link.click(); });
     window.addEventListener('resize', () => { climateChart.resize(); forecastChart.resize(); });
-
+    
+    function mostrarAtributosParcela(feature) {
+        const props = feature.properties || {};
+        const atributosDiv = document.getElementById('parcela-atributos');
+        const infoCard = document.getElementById('parcela-info-card');
+        
+        currentParcelaData = {
+            Productor: props.Nombre || "—",
+            Cedula: props.C_I || "—",
+            Tecnico: props.N_Tecnico || "—",
+            Rubro: props.Rubro || "—",
+            Localidad: props.Localidad || "—"
+        };
+        
+        const campos = [
+            { key: "Nombre", label: "Productor", icon: "fas fa-user-circle", default: "—" },
+            { key: "C_I", label: "Cédula", icon: "fas fa-id-card", default: "—" },
+            { key: "N_Tecnico", label: "Técnico", icon: "fas fa-chalkboard-user", default: "—" },
+            { key: "Rubro", label: "Rubro", icon: "fas fa-seedling", default: "—" },
+            { key: "Localidad", label: "Localidad", icon: "fas fa-map-pin", default: "—" }
+        ];
+        
+        let html = `<div class="parcela-info-grid">`;
+        for (let campo of campos) {
+            let valor = props[campo.key];
+            if (valor === null || valor === undefined || valor === "") {
+                valor = campo.default;
+            }
+            html += `
+                <div class="info-item">
+                    <div class="info-icon"><i class="${campo.icon}"></i></div>
+                    <div class="info-content">
+                        <div class="info-label">${campo.label}</div>
+                        <div class="info-value">${valor}</div>
+                    </div>
+                </div>
+            `;
+        }
+        html += `</div>`;
+        const cardHeader = `<div class="card-header"><i class="fas fa-tractor"></i><h3>DATOS DEL PRODUCTOR</h3></div>`;
+        atributosDiv.innerHTML = cardHeader + html;
+        infoCard.style.display = 'block';
+    }
+    
     async function cargarParcelas() {
         try {
             const res = await fetch('/api/parcelas');
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            if (!res.ok) throw new Error('Error al cargar parcelas');
             const data = await res.json();
             const geoJsonLayer = L.geoJSON(data, {
                 style: { color: "#f97316", weight: 2, fillOpacity: 0.1, dashArray: '5,5' },
@@ -738,67 +625,51 @@
                     l.on('click', () => {
                         currentFeature = f;
                         currentParcelaId = f.id || f.properties?.id || `parcela_${Date.now()}`;
-                        currentParcelaNombre = f.properties?.nombre || f.properties?.NOMBRE || "Parcela";
+                        currentParcelaNombre = f.properties?.Nombre || f.properties?.NOMBRE || "Parcela sin nombre";
+                        document.getElementById('btn-cuaderno').disabled = false;
+                        mostrarAtributosParcela(f);
                         actualizarTodo();
                     });
                 }
             }).addTo(map);
             map.fitBounds(geoJsonLayer.getBounds());
-        } catch (err) {
-            console.error("Error cargando parcelas:", err);
-            document.getElementById('result-container').innerHTML = `<div style="color:#ef4444">?? No se pudo conectar con el servidor. Verifique que el backend est¨¦ corriendo.</div>`;
-        }
+        } catch(e) { console.error(e); alert("No se pudieron cargar las parcelas. ¿El servidor está corriendo?"); }
     }
-
+    
     async function actualizarTodo() {
-        if (!currentFeature) {
-            console.warn("No hay parcela seleccionada");
-            return;
-        }
-        document.getElementById('loading').style.display = 'block';
+        if (!currentFeature) return;
+        const loading = document.getElementById('loading');
+        loading.style.display = 'block';
         try {
             await Promise.all([actualizarAnalisis(), cargarPronostico(), cargarClimaHistorico(), actualizarRecomendacion()]);
-        } catch(e) { console.error("Error en actualizarTodo:", e); }
-        document.getElementById('loading').style.display = 'none';
+        } catch(e) { console.error(e); setTimeout(() => loading.style.display = 'none', 1000); return; }
+        loading.style.display = 'none';
     }
-
+    
     async function actualizarAnalisis() {
-        if (!currentFeature) return;
         const fecha = document.getElementById('fecha-input').value;
-        try {
-            const res = await fetch('/api/analizar', {
-                method:'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({ feature: currentFeature, tipo: modoActual, fecha })
-            });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            if (data.error) throw new Error(data.error);
-            if (window.satLayerActual) map.removeLayer(window.satLayerActual);
-            window.satLayerActual = L.tileLayer(data.tile_url, { opacity: 0.85 }).addTo(map);
-            const haTotal = data.desglose.reduce((a,b)=>a+b.ha,0);
-            let barras = '';
-            data.desglose.forEach(item => {
-                const porcentaje = (item.ha / haTotal) * 100;
-                barras += `<div style="margin-bottom: 12px;"><div style="display:flex; justify-content:space-between; font-size:0.7rem;"><span>${item.etiqueta}</span><span>${item.ha.toFixed(1)} ha (${porcentaje.toFixed(0)}%)</span></div><div class="progress-bar"><div class="progress-fill" style="width: ${porcentaje}%; background: ${item.color};"></div></div></div>`;
-            });
-            document.getElementById('result-container').innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom:12px;">
-                    <div style="color:var(--primary); font-weight:800;">${data.tipo} medio</div>
-                    <div style="font-size: 2rem; font-weight:800;">${data.valor}</div>
-                </div>
-                <div style="margin: 8px 0;">?? Superficie total: <strong>${haTotal.toFixed(1)} ha</strong></div>
-                ${barras}
-                <div style="font-size: 0.65rem; margin-top: 12px; color:#64748b;">??? Imagen: ${data.fecha_satelite} ¡¤ 10m</div>
-            `;
-            historial.push({Fecha: data.fecha_satelite, Tipo: data.tipo, Valor: data.valor});
-        } catch(err) {
-            console.error("Error en actualizarAnalisis:", err);
-            document.getElementById('result-container').innerHTML = `<div style="color:#ef4444">?? Error al obtener an¨¢lisis: ${err.message}</div>`;
-        }
+        const res = await fetch('/api/analizar', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ feature: currentFeature, tipo: modoActual, fecha })
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        if (window.satLayerActual) map.removeLayer(window.satLayerActual);
+        window.satLayerActual = L.tileLayer(data.tile_url, { opacity: 0.9 }).addTo(map);
+        const haTotal = data.desglose.reduce((a,b)=>a+b.ha,0);
+        let barras = '';
+        data.desglose.forEach(item => {
+            const p = (item.ha / haTotal) * 100;
+            barras += `<div style="margin-bottom:10px;"><div style="display:flex; justify-content:space-between; font-size:0.7rem;"><span>${item.etiqueta}</span><span>${item.ha.toFixed(1)} ha (${p.toFixed(0)}%)</span></div><div class="progress-bar"><div class="progress-fill" style="width:${p}%; background:${item.color};"></div></div></div>`;
+        });
+        document.getElementById('result-container').innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:baseline;"><div style="color:var(--primary); font-weight:700;">${data.tipo} medio</div><div style="font-size:1.8rem; font-weight:800;">${data.valor}</div></div>
+            <div style="margin:12px 0;">?? Superficie total: <strong>${haTotal.toFixed(1)} ha</strong></div>${barras}
+            <div style="font-size:0.65rem; margin-top:12px; color:#64748b;">??? Imagen: ${data.fecha_satelite} · Resolución 10m</div>`;
+        historial.push({Fecha: data.fecha_satelite, Tipo: data.tipo, Valor: data.valor});
     }
-
+    
     async function cargarPronostico() {
-        if (!currentFeature) return;
         const errorDiv = document.getElementById('forecast-error-msg');
         errorDiv.style.display = 'none';
         try {
@@ -806,139 +677,122 @@
                 method:'POST', headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({ feature: currentFeature })
             });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
-            console.log("Pron¨®stico recibido:", data);
             if (data.error) throw new Error(data.error);
-            if (!Array.isArray(data)) throw new Error("El pron¨®stico no es un array");
+            data.forEach(d => { d.alerta_helada = (d.temp_min_c <= 3); });
             currentPronostico = data;
             const hayHelada = data.some(d => d.alerta_helada);
-            document.getElementById('helada-banner-container').innerHTML = hayHelada ? `<div class="helada-warning"><i class="fas fa-temperature-low fa-2x"></i><div><strong>?? ALERTA T¨¦CNICA</strong><br>Se prev¨¦n temperaturas ¡Ü 3¡ãC en los pr¨®ximos d¨ªas. Riesgo de helada agrometeorol¨®gica.</div></div>` : '';
+            document.getElementById('helada-banner-container').innerHTML = hayHelada ? `<div class="helada-warning"><i class="fas fa-temperature-low fa-2x"></i><div><strong>?? ALERTA TÉCNICA</strong><br>Se prevén temperaturas = 3°C en los próximos días. Riesgo de helada.</div></div>` : '';
             const fechas = data.map(d => d.fecha.slice(5));
             forecastChart.setOption({
                 tooltip: tooltipConfig,
-                legend: { data: ['Precipitaci¨®n (mm)','Balance h¨ªdrico (mm)','Temperatura m¨ªnima (¡ãC)','Temperatura m¨¢xima (¡ãC)','Humedad relativa (%)'], ...legendBottom },
-                grid: { top: 45, left: 65, right: 75, bottom: 70, containLabel: true, backgroundColor: 'rgba(0,0,0,0.2)' },
-                xAxis: { type: 'category', data: fechas, axisLabel: { rotate: 45, fontSize: 9, color: '#cbd5e1' }, axisLine: { lineStyle: { color: '#334155' } } },
+                legend: { data: ['Precipitación (mm)', 'Balance hídrico (mm)', 'Temperatura mínima (°C)', 'Temperatura máxima (°C)', 'Humedad relativa (%)'], ...legendBottom },
+                grid: { top: 45, left: 65, right: 75, bottom: 70, containLabel: true },
+                xAxis: { type: 'category', data: fechas, axisLabel: { rotate: 45, fontSize: 10, color: '#cbd5e1' } },
                 yAxis: [
-                    { type: 'value', name: 'Precipitaci¨®n / Balance (mm)', nameTextStyle: { color: '#94a3b8' }, splitLine: { lineStyle: { color: '#1e293b' } } },
-                    { type: 'value', name: 'Temperatura (¡ãC) / Humedad (%)', nameTextStyle: { color: '#94a3b8' }, splitLine: { show: false } }
+                    { type: 'value', name: 'Precipitación / Balance (mm)', nameTextStyle: { color: '#94a3b8' }, splitLine: { lineStyle: { color: '#1e293b' } }, axisLabel: { color: '#cbd5e1' } },
+                    { type: 'value', name: 'Temperatura (°C) / Humedad (%)', nameTextStyle: { color: '#94a3b8' }, splitLine: { show: false }, axisLabel: { color: '#cbd5e1' } }
                 ],
                 series: [
-                    { name: 'Precipitaci¨®n (mm)', type: 'bar', data: data.map(d=>d.precipitacion_mm), itemStyle: { color: COLORS.PRECIP, borderRadius: [4,4,0,0] }, barWidth: '50%', yAxisIndex: 0, label: getLabelConfig() },
-                    { name: 'Balance h¨ªdrico (mm)', type: 'line', data: data.map(d=>d.balance_mm), lineStyle: { color: COLORS.BALANCE, width: 2, type: 'dashed' }, symbol: 'circle', yAxisIndex: 0, label: getLabelConfig() },
-                    { name: 'Temperatura m¨ªnima (¡ãC)', type: 'line', yAxisIndex: 1, data: data.map(d=>d.temp_min_c), lineStyle: { color: COLORS.TEMP_MIN, width: 2 }, areaStyle: { opacity: 0.1 }, label: getLabelConfig() },
-                    { name: 'Temperatura m¨¢xima (¡ãC)', type: 'line', yAxisIndex: 1, data: data.map(d=>d.temp_max_c), lineStyle: { color: COLORS.TEMP_MAX, width: 2 }, areaStyle: { opacity: 0.1 }, label: getLabelConfig() },
+                    { name: 'Precipitación (mm)', type: 'bar', data: data.map(d=>d.precipitacion_mm), itemStyle: { color: COLORS.PRECIP, borderRadius: [4,4,0,0] }, barWidth: '50%', yAxisIndex: 0, label: getLabelConfig() },
+                    { name: 'Balance hídrico (mm)', type: 'line', data: data.map(d=>d.balance_mm), lineStyle: { color: COLORS.BALANCE, width: 2, type: 'dashed' }, symbol: 'circle', symbolSize: 6, yAxisIndex: 0, label: getLabelConfig() },
+                    { name: 'Temperatura mínima (°C)', type: 'line', yAxisIndex: 1, data: data.map(d=>d.temp_min_c), lineStyle: { color: COLORS.TEMP_MIN, width: 2 }, label: getLabelConfig() },
+                    { name: 'Temperatura máxima (°C)', type: 'line', yAxisIndex: 1, data: data.map(d=>d.temp_max_c), lineStyle: { color: COLORS.TEMP_MAX, width: 2 }, label: getLabelConfig() },
                     { name: 'Humedad relativa (%)', type: 'line', yAxisIndex: 1, data: data.map(d=>d.humedad_relativa_max), lineStyle: { color: COLORS.HUMEDAD, width: 2, type: 'dashed' }, symbol: 'diamond', label: getLabelConfig() }
                 ]
             });
+            forecastChart.resize();
             let boxes = '';
             data.forEach(d => {
                 boxes += `<div class="forecast-box ${d.alerta_helada ? 'helada' : ''}">
                             <span><strong>${d.fecha.slice(5)}</strong></span>
-                            <b>${d.temp_min_c}¡ã / ${d.temp_max_c}¡ã</b>
+                            <b>${d.temp_min_c}° / ${d.temp_max_c}°</b>
                             <span>??? ${d.precipitacion_mm} mm</span>
-                            <span style="display:block;font-size:0.65rem;">?? ${d.balance_mm} mm</span>
+                            <span style="display:block; font-size:0.65rem;">?? ${d.balance_mm} mm</span>
                             <span>?? Humedad: ${d.humedad_relativa_max}%</span>
-                            ${d.alerta_helada ? '<i class="fas fa-icicles" style="color:#ef4444;"></i> Helada!' : ''}
+                            ${d.alerta_helada ? '<i class="fas fa-icicles" style="color:#ef4444;"></i> <span style="color:#ef4444;">Helada!</span>' : ''}
                           </div>`;
             });
             document.getElementById('forecast-data-boxes').innerHTML = boxes;
         } catch(err) {
-            console.error("Error en cargarPronostico:", err);
-            errorDiv.innerText = `?? No se pudo cargar el pron¨®stico: ${err.message}`;
+            errorDiv.innerText = '?? No se pudo cargar el pronóstico. Verifique la conexión con el servidor.';
             errorDiv.style.display = 'block';
-            forecastChart.setOption({ title: { show: true, text: 'Error al cargar pron¨®stico', left: 'center', top: 'middle', textStyle: { color: '#ef4444' } }, series: [] });
         }
     }
-
+    
     async function cargarClimaHistorico() {
-        if (!currentFeature) return;
         try {
-            const res = await fetch('/api/historial_clima', {
+            const res = await fetch('/api/clima_historico', {
                 method:'POST', headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({ feature: currentFeature })
             });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
-            console.log("Historial clim¨¢tico recibido:", data);
             if (data.error) throw new Error(data.error);
-            if (!data.fechas || !Array.isArray(data.fechas)) throw new Error("Formato de historial inv¨¢lido");
+            if (!data.fechas || data.fechas.length === 0) throw new Error('Sin datos climáticos');
             const fechas = data.fechas.map(f => f.split('-').slice(1).join('/'));
+            climateChart.clear();
             climateChart.setOption({
                 tooltip: tooltipConfig,
-                legend: { data: ['Precipitaci¨®n (mm)','Temperatura m¨ªnima (¡ãC)','Temperatura m¨¢xima (¡ãC)','Humedad relativa (%)'], ...legendBottom },
-                grid: { top: 35, left: 60, right: 70, bottom: 60, containLabel: true, backgroundColor: 'rgba(0,0,0,0.2)' },
-                xAxis: { type: 'category', data: fechas, axisLabel: { rotate: 45, fontSize: 8, margin: 12 } },
+                legend: { data: ['Precipitación (mm)', 'Temperatura mínima (°C)', 'Temperatura máxima (°C)', 'Humedad relativa (%)'], ...legendBottom },
+                grid: { top: 45, left: 60, right: 70, bottom: 70, containLabel: true },
+                xAxis: { type: 'category', data: fechas, axisLabel: { rotate: 45, fontSize: 9, color: '#cbd5e1' } },
                 yAxis: [
-                    { type: 'value', name: 'Precipitaci¨®n (mm)', nameTextStyle: { color: COLORS.PRECIP } },
-                    { type: 'value', name: 'Temperatura (¡ãC) / Humedad (%)', nameTextStyle: { color: '#94a3b8' }, splitLine: { show: false } }
+                    { type: 'value', name: 'Precipitación (mm)', nameTextStyle: { color: '#94a3b8' }, splitLine: { lineStyle: { color: '#1e293b' } }, axisLabel: { color: '#cbd5e1' } },
+                    { type: 'value', name: 'Temperatura / Humedad', nameTextStyle: { color: '#94a3b8' }, splitLine: { show: false }, axisLabel: { color: '#cbd5e1' } }
                 ],
                 series: [
-                    { name: 'Precipitaci¨®n (mm)', type: 'bar', data: data.precipitacion, itemStyle: { color: COLORS.PRECIP, borderRadius: [4,4,0,0] }, barWidth: '60%', yAxisIndex: 0, label: getLabelConfig() },
-                    { name: 'Temperatura m¨ªnima (¡ãC)', type: 'line', yAxisIndex: 1, data: data.temp_min, lineStyle: { color: COLORS.TEMP_MIN, width: 2 }, smooth: true, areaStyle: { opacity: 0.1 }, label: getLabelConfig() },
-                    { name: 'Temperatura m¨¢xima (¡ãC)', type: 'line', yAxisIndex: 1, data: data.temp_max, lineStyle: { color: COLORS.TEMP_MAX, width: 2 }, smooth: true, areaStyle: { opacity: 0.1 }, label: getLabelConfig() },
-                    { name: 'Humedad relativa (%)', type: 'line', yAxisIndex: 1, data: data.humedad, lineStyle: { color: COLORS.HUMEDAD, width: 2, type: 'dashed' }, symbol: 'diamond', label: getLabelConfig() }
+                    { name: 'Precipitación (mm)', type: 'bar', yAxisIndex: 0, data: data.precipitacion, itemStyle: { color: COLORS.PRECIP, borderRadius: [4,4,0,0] }, barWidth: '55%', label: getLabelConfig() },
+                    { name: 'Temperatura mínima (°C)', type: 'line', yAxisIndex: 1, data: data.temp_min, smooth: true, lineStyle: { color: COLORS.TEMP_MIN, width: 2 }, areaStyle: { opacity: 0.1 }, label: getLabelConfig() },
+                    { name: 'Temperatura máxima (°C)', type: 'line', yAxisIndex: 1, data: data.temp_max, smooth: true, lineStyle: { color: COLORS.TEMP_MAX, width: 2 }, areaStyle: { opacity: 0.1 }, label: getLabelConfig() },
+                    { name: 'Humedad relativa (%)', type: 'line', yAxisIndex: 1, data: data.humedad, smooth: true, symbol: 'diamond', lineStyle: { color: COLORS.HUMEDAD, width: 2, type: 'dashed' }, label: getLabelConfig() }
                 ]
             });
             climateChart.resize();
         } catch(err) {
-            console.error("Error en cargarClimaHistorico:", err);
-            climateChart.setOption({ title: { show: true, text: `Error: ${err.message}`, left: 'center', top: 'middle', textStyle: { color: '#ef4444' } }, series: [] });
+            console.error("ERROR HISTORIAL:", err);
+            climateChart.clear();
+            climateChart.setOption({ title: { show: true, text: 'No se pudo cargar historial climático', left: 'center', top: 'middle', textStyle: { color: '#94a3b8', fontSize: 14 } } });
         }
     }
-
+    
     async function actualizarRecomendacion() {
-        if (!currentFeature) return;
         const cultivo = document.getElementById('cultivo-select').value;
         const fechaSiembra = document.getElementById('fecha-siembra').value;
         const variedad = document.getElementById('nombre-variedad').value;
-        try {
-            const res = await fetch('/api/recomendacion', {
-                method:'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({ cultivo, fecha_siembra: fechaSiembra, variedad, pronostico: currentPronostico })
-            });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            document.getElementById('recomendacion-container').innerHTML = `<i class="fas fa-leaf"></i> ${data.recomendacion.replace(/\n/g,'<br>')}`;
-        } catch(err) {
-            console.error("Error en recomendaci¨®n:", err);
-            document.getElementById('recomendacion-container').innerHTML = `?? No se pudo obtener recomendaci¨®n: ${err.message}`;
-        }
+        document.getElementById('recomendacion-container').innerHTML = `<i class="fas fa-leaf"></i> Recomendación basada en ${cultivo}. Siembra: ${fechaSiembra}. Variedad: ${variedad || 'No especificada'}.<br>Consulte el chat para más detalles.`;
     }
-
+    
     function setModo(modo, btn) {
         modoActual = modo;
         document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         actualizarAnalisis();
     }
-
+    
     document.getElementById('toggle-frost-btn').addEventListener('click', async () => {
-        if (frostLayer) { map.removeLayer(frostLayer); frostLayer = null; document.getElementById('toggle-frost-btn').style.borderColor = 'var(--accent)'; document.getElementById('toggle-frost-btn').innerHTML = '<i class="fas fa-temperature-low"></i> Mapa de heladas'; return; }
+        if (frostLayer) { map.removeLayer(frostLayer); frostLayer = null; document.getElementById('toggle-frost-btn').style.borderColor = 'var(--accent)'; document.getElementById('toggle-frost-btn').innerHTML = '<i class="fas fa-temperature-low"></i> Mostrar mapa de heladas (última noche)'; return; }
         document.getElementById('loading').style.display = 'block';
         try {
             const res = await fetch('/api/mapa_heladas', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ feature: currentFeature }) });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
+            if (data.error) throw new Error(data.error);
             if (data.tile_url) {
                 frostLayer = L.tileLayer(data.tile_url, { opacity: 0.7 }).addTo(map);
                 document.getElementById('toggle-frost-btn').style.borderColor = '#ef4444';
                 document.getElementById('toggle-frost-btn').innerHTML = `<i class="fas fa-temperature-low"></i> Capa activa (${data.fecha})`;
-            } else throw new Error('Sin capa de heladas');
-        } catch(e) { alert('Error carga heladas: '+e.message); }
-        finally { document.getElementById('loading').style.display = 'none'; }
+            } else throw new Error('Respuesta sin tile_url');
+        } catch(e) { alert('? ' + e.message); } finally { document.getElementById('loading').style.display = 'none'; }
     });
-
+    
     function exportarExcel() {
         const ws = XLSX.utils.json_to_sheet(historial);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Monitoreo");
         XLSX.writeFile(wb, `reporte_${document.getElementById('cultivo-select').value}.xlsx`);
     }
-
+    
     function generarReportePDF() {
-        if (!currentFeature) { alert("Selecciona una parcela."); return; }
+        if (!currentFeature) { alert("Primero selecciona una parcela en el mapa."); return; }
         const cultivo = document.getElementById('cultivo-select').options[document.getElementById('cultivo-select').selectedIndex].text;
         const variedad = document.getElementById('nombre-variedad').value || "No especificada";
         const fechaSiembra = document.getElementById('fecha-siembra').value;
@@ -950,57 +804,37 @@
         let climateChartImg = climateChartCanvas ? `<img src="${climateChartCanvas.toDataURL()}" style="width:100%; max-width:600px; margin:20px 0;" />` : '';
         const forecastChartCanvas = document.querySelector('#forecast-chart canvas');
         let forecastChartImg = forecastChartCanvas ? `<img src="${forecastChartCanvas.toDataURL()}" style="width:100%; max-width:600px; margin:20px 0;" />` : '';
-        const contenido = `<html><head><title>Reporte FrutihorMonitor</title><style>body{font-family:Inter;padding:30px;background:white;color:#0f172a;} h1{color:#f97316;} .section{margin-bottom:30px;} .forecast-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;} .forecast-box{background:#f1f5f9;padding:8px;border-radius:12px;text-align:center;} .helada{border-left:4px solid #ef4444;}</style></head><body><h1>?? Reporte T¨¦cnico FrutihorMonitor PRO</h1><p><strong>Parcela:</strong> ${currentParcelaNombre}</p><p><strong>Fecha:</strong> ${new Date().toLocaleString()}</p><div class="section"><h2>?? Datos Cultivo</h2><p>Cultivo: ${cultivo}<br>Variedad: ${variedad}<br>Siembra: ${fechaSiembra}<br>Monitoreo: ${fechaMonitoreo}</p></div><div class="section"><h2>??? An¨¢lisis</h2>${analisisHtml}</div><div class="section"><h2>?? Recomendaci¨®n</h2>${recomendacionHtml}</div><div class="section"><h2>?? Historial Clim¨¢tico</h2>${climateChartImg}</div><div class="section"><h2>??? Pron¨®stico 10 d¨ªas</h2>${forecastChartImg}<div class="forecast-grid">${pronosticoHtml}</div></div><footer style="margin-top:40px;font-size:10px;color:#64748b;text-align:center;">Generado por FrutihorMonitor ¡¤ NABLA CONSULTORES S.R.L</footer></body></html>`;
+        
+        const productorData = `
+            <table style="width:100%; border-collapse:collapse; margin:15px 0; background:#f8f9fa;">
+                <tr><td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Productor</strong></td><td style="padding:8px; border-bottom:1px solid #ddd;">${currentParcelaData.Productor}</td></tr>
+                <tr><td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Cédula</strong></td><td style="padding:8px; border-bottom:1px solid #ddd;">${currentParcelaData.Cedula}</td></tr>
+                <tr><td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Nombre del Técnico</strong></td><td style="padding:8px; border-bottom:1px solid #ddd;">${currentParcelaData.Tecnico}</td></tr>
+                <tr><td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Rubro</strong></td><td style="padding:8px; border-bottom:1px solid #ddd;">${currentParcelaData.Rubro}</td></tr>
+                <tr><td style="padding:8px;"><strong>Localidad</strong></td><td style="padding:8px;">${currentParcelaData.Localidad}</td></tr>
+            </table>
+        `;
+        
+        const contenido = `<html><head><title>Reporte Técnico - FrutihorMonitor</title><style>body{font-family:'Inter',Arial,sans-serif;padding:30px;background:white;color:#0f172a;}h1{color:#f97316;}.section{margin-bottom:30px;border-bottom:1px solid #ccc;padding-bottom:15px;}.forecast-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}.forecast-box{background:#f1f5f9;padding:8px;border-radius:12px;text-align:center;}.helada{border-left:4px solid #ef4444;background:#fee2e2;}</style></head><body><h1>?? Reporte Técnico FrutihorMonitor PRO</h1><p><strong>Parcela:</strong> ${currentParcelaNombre}</p><p><strong>Fecha de generación:</strong> ${new Date().toLocaleString()}</p><div class="section"><h2>?? Datos del Productor</h2>${productorData}</div><div class="section"><h2>?? Datos del Cultivo</h2><p><strong>Cultivo:</strong> ${cultivo}</p><p><strong>Variedad:</strong> ${variedad}</p><p><strong>Fecha de siembra:</strong> ${fechaSiembra}</p><p><strong>Fecha de monitoreo satelital:</strong> ${fechaMonitoreo}</p></div><div class="section"><h2>??? Análisis de Índices</h2>${analisisHtml}</div><div class="section"><h2>?? Recomendación Inteligente</h2>${recomendacionHtml}</div><div class="section"><h2>?? Historial Climático (últimos 30 días)</h2>${climateChartImg || '<p>Gráfico no disponible</p>'}</div><div class="section"><h2>??? Pronóstico Agroclimático 10 días</h2>${forecastChartImg || '<p>Gráfico no disponible</p>'}<div class="forecast-grid">${pronosticoHtml}</div></div><footer style="margin-top:40px; font-size:10px; color:#64748b; text-align:center;">Generado por FrutihorMonitor · NABLA CONSULTORES S.R.L</footer></body></html>`;
         const ventana = window.open('', '_blank');
         ventana.document.write(contenido);
         ventana.document.close();
         ventana.print();
     }
-
-    // ----- CHAT con backend seguro -----
-    let chatHistory = [{ role: "system", content: "Eres experto en tomate, cebolla, papa. Ayudas con heladas, fenolog¨ªa." }];
+    
+    // CHAT con el backend seguro (Groq desde el servidor)
+    let chatHistory = [{ role: "system", content: "Eres Tom, experto en tomate, cebolla, papa. Ayudas con heladas, fenología y manejo integrado." }];
     function toggleChat() { document.getElementById('chat-window').classList.toggle('open'); }
-    function addMessage(text, isUser) {
-        const container = document.getElementById('chat-messages');
-        const div = document.createElement('div');
-        div.className = isUser ? 'user-message' : 'bot-message';
-        div.innerText = text;
-        container.appendChild(div);
-        container.scrollTop = container.scrollHeight;
+    function addMessage(text, isUser) { const container = document.getElementById('chat-messages'); const div = document.createElement('div'); div.className = isUser ? 'user-message' : 'bot-message'; div.innerText = text; container.appendChild(div); container.scrollTop = container.scrollHeight; }
+    function exportChatToPDF() { 
+        const messages = document.querySelectorAll('#chat-messages .user-message, #chat-messages .bot-message'); 
+        if (messages.length === 0) { alert("No hay mensajes en el chat para exportar."); return; } 
+        let html = `<html><head><title>Resumen Chat - FrutihorMonitor</title><style>body{font-family:'Inter',Arial,sans-serif;padding:30px;background:white;color:#0f172a;}h1{color:#f97316;}.message{margin-bottom:15px;padding:10px;border-radius:12px;}.user{background:#f97316;color:white;text-align:right;}.bot{background:#e2e8f0;color:#0f172a;}.timestamp{font-size:10px;color:#64748b;margin-top:5px;}</style></head><body><h1>?? Resumen de Conversación - Asistente Tom</h1><p>Fecha: ${new Date().toLocaleString()}</p><hr>`; 
+        messages.forEach((msg, idx) => { const isUser = msg.classList.contains('user-message'); const text = msg.innerText; html += `<div class="message ${isUser ? 'user' : 'bot'}"><strong>${isUser ? '?? Tú' : '?? Tom'}:</strong><br>${text}<div class="timestamp">${new Date().toLocaleTimeString()}</div></div>`; }); 
+        html += `<hr><footer style="margin-top:40px; font-size:10px; color:#64748b; text-align:center;">Generado por FrutihorMonitor · NABLA CONSULTORES S.R.L</footer></body></html>`; 
+        const ventana = window.open('', '_blank'); ventana.document.write(html); ventana.document.close(); ventana.print(); 
     }
-    function exportChatToPDF() {
-        const messages = document.querySelectorAll('#chat-messages .user-message, #chat-messages .bot-message');
-        if (messages.length === 0) { alert("No hay mensajes para exportar."); return; }
-        let html = `<html><head><meta charset="UTF-8"><title>Historial Chat FrutihorMonitor</title><style>
-            body{font-family:'Inter',Arial;padding:30px;background:white;color:#0f172a;}
-            h1{color:#f97316;} .message{margin-bottom:15px;padding:12px;border-radius:16px;}
-            .user{background:#f97316;color:white;text-align:right;}
-            .bot{background:#e2e8f0;color:#0f172a;} .timestamp{font-size:10px;color:#64748b;margin-top:6px;}
-            hr{margin:20px 0;} footer{text-align:center;margin-top:40px;font-size:10px;color:#64748b;}
-        </style></head><body>
-        <h1>?? Conversaci¨®n con Asistente Tom</h1>
-        <p>Fecha exportaci¨®n: ${new Date().toLocaleString()}</p><hr>`;
-        messages.forEach(msg => {
-            const isUser = msg.classList.contains('user-message');
-            const texto = msg.innerText;
-            html += `<div class="message ${isUser ? 'user' : 'bot'}"><strong>${isUser ? '?? T¨²' : '?? Tom'}:</strong><br>${texto.replace(/\n/g,'<br>')}<div class="timestamp">${new Date().toLocaleTimeString()}</div></div>`;
-        });
-        html += `<hr><footer>Generado por FrutihorMonitor ¡¤ NABLA CONSULTORES S.R.L</footer></body></html>`;
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'absolute';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
-        iframe.style.border = 'none';
-        document.body.appendChild(iframe);
-        const iframeDoc = iframe.contentWindow.document;
-        iframeDoc.open();
-        iframeDoc.write(html);
-        iframeDoc.close();
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-        setTimeout(() => document.body.removeChild(iframe), 1000);
-    }
-
+    
     async function sendMessage() {
         const input = document.getElementById('chat-input');
         const text = input.value.trim();
@@ -1008,76 +842,48 @@
         addMessage(text, true);
         input.value = '';
         const lower = text.toLowerCase();
-        if (lower.includes('pdf') || lower.includes('reporte') || lower.includes('exportar')) {
-            addMessage("?? Generando reporte t¨¦cnico en PDF...", false);
-            setTimeout(() => generarReportePDF(), 300);
+        if (lower.includes('pdf') || lower.includes('reporte') || lower.includes('generar reporte') || lower.includes('exportar a pdf')) {
+            addMessage("?? Generando reporte técnico en PDF...", false);
+            setTimeout(() => generarReportePDF(), 500);
             return;
         }
         addMessage("?? Analizando...", false);
         
-        const mensajesChat = [];
-        document.querySelectorAll('#chat-messages .user-message, #chat-messages .bot-message').forEach(msg => {
-            const rol = msg.classList.contains('user-message') ? 'user' : 'assistant';
-            mensajesChat.push({ role: rol, content: msg.innerText });
-        });
-        mensajesChat.pop(); // remove the temporary "Analizando..."
+        const productorInfo = `Productor: ${currentParcelaData.Productor}, Cédula: ${currentParcelaData.Cedula}, Técnico: ${currentParcelaData.Tecnico}, Rubro: ${currentParcelaData.Rubro}, Localidad: ${currentParcelaData.Localidad}`;
+        const contexto = `Cultivo: ${document.getElementById('cultivo-select').value}, Fenología según siembra: ${document.getElementById('fecha-siembra').value}, Heladas pronosticadas: ${currentPronostico.some(d=>d.alerta_helada)}. Datos del productor: ${productorInfo}`;
         
         try {
-            const res = await fetch('/api/chat', {
+            const res = await fetch('/api/chat-groq', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    mensaje: text,
-                    historial: mensajesChat,
-                    cultivo: document.getElementById('cultivo-select').value,
-                    alerta_helada: currentPronostico.some(d => d.alerta_helada)
-                })
+                body: JSON.stringify({ message: text, contexto: contexto })
             });
             const data = await res.json();
+            const reply = data.respuesta || data.error || "Lo siento, no pude procesar tu consulta.";
             document.querySelector('#chat-messages .bot-message:last-child').remove();
-            if (data.error) {
-                addMessage("? Error: " + data.error, false);
-            } else {
-                addMessage(data.respuesta, false);
-            }
+            addMessage(reply, false);
+            chatHistory.push({role:"user", content:text}, {role:"assistant", content:reply});
         } catch(e) {
             document.querySelector('#chat-messages .bot-message:last-child').remove();
-            addMessage("Error de conexi¨®n con el servidor", false);
+            addMessage("Error de conexión con el servidor. Intente nuevamente.", false);
         }
     }
-
-    // ----- CUADERNO DE CAMPO -----
+    
+    // CUADERNO DE CAMPO (todas las funciones permanecen igual, solo se ajustan las URLs relativas)
     const modalCuaderno = document.getElementById('modal-cuaderno');
     const btnCuaderno = document.getElementById('btn-cuaderno');
     const closeModalBtn = document.getElementById('close-modal');
     const formLabor = document.getElementById('form-labor');
+    const parcelaInfoDiv = document.getElementById('parcela-info');
     const listaLaboresDiv = document.getElementById('lista-labores');
-    function abrirCuaderno() { if(!currentParcelaId){alert("Selecciona parcela");return;} document.getElementById('parcela-info').innerHTML = `<strong>?? Parcela:</strong> ${currentParcelaNombre}`; document.getElementById('parcela-id-input').value = currentParcelaId; document.getElementById('labor-fecha').valueAsDate = new Date(); cargarHistorial(); modalCuaderno.style.display = 'flex'; }
+    function abrirCuaderno() { if (!currentParcelaId) { alert("Primero selecciona una parcela en el mapa."); return; } parcelaInfoDiv.innerHTML = `<strong>?? Parcela:</strong> ${currentParcelaNombre || currentParcelaId}<br><strong>Productor:</strong> ${currentParcelaData.Productor}`; document.getElementById('parcela-id-input').value = currentParcelaId; document.getElementById('labor-fecha').valueAsDate = new Date(); cargarHistorial(); modalCuaderno.style.display = 'flex'; }
     function cerrarModal() { modalCuaderno.style.display = 'none'; }
-    async function cargarHistorial() {
-        listaLaboresDiv.innerHTML = '<div style="text-align:center;">Cargando...</div>';
-        try {
-            const res = await fetch(`/api/cuaderno?parcela_id=${encodeURIComponent(currentParcelaId)}`);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const labores = await res.json();
-            if (!labores.length) { listaLaboresDiv.innerHTML = '<div style="text-align:center;color:#94a3b8;">Sin registros</div>'; return; }
-            let html = '';
-            labores.forEach(lab => {
-                html += `<div class="labor-item"><div class="fecha">?? ${lab.fecha}</div><div><strong>${lab.tipo_labor}</strong> ${lab.insumo ? `¡¤ ${lab.insumo} (${lab.dosis})` : ''}</div><div>?? ${lab.operario || '¡ª'}</div><div>?? ${lab.observaciones || ''}</div><div class="labor-actions"><button onclick="eliminarLabor(${lab.id})"><i class="fas fa-trash-alt"></i> Eliminar</button></div></div>`;
-            });
-            listaLaboresDiv.innerHTML = html;
-        } catch(e) { listaLaboresDiv.innerHTML = '<div style="color:#ef4444;">Error al cargar historial</div>'; console.error(e); }
-    }
-    async function guardarLabor(e) {
-        e.preventDefault();
-        const data = { parcela_id: currentParcelaId, fecha: document.getElementById('labor-fecha').value, tipo_labor: document.getElementById('labor-tipo').value, insumo: document.getElementById('labor-insumo').value, dosis: document.getElementById('labor-dosis').value, operario: document.getElementById('labor-operario').value, observaciones: document.getElementById('labor-obs').value };
-        const res = await fetch('/api/cuaderno', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) });
-        if (res.ok) { alert("Guardado"); formLabor.reset(); document.getElementById('labor-fecha').valueAsDate = new Date(); cargarHistorial(); } else alert("Error");
-    }
-    async function eliminarLabor(id) { if(confirm("?Eliminar?")){ await fetch(`/api/cuaderno/${id}`, { method:'DELETE' }); cargarHistorial(); } }
-    function exportarCuadernoExcel() { fetch(`/api/cuaderno?parcela_id=${encodeURIComponent(currentParcelaId)}`).then(r=>r.json()).then(labores=>{ const ws=XLSX.utils.json_to_sheet(labores); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,`Cuaderno_${currentParcelaId}`); XLSX.writeFile(wb,`cuaderno_${currentParcelaId}.xlsx`); }).catch(()=>alert("Error")); }
-    function exportarCuadernoPDF() { const cont = document.getElementById('lista-labores').cloneNode(true); const w=window.open('','_blank'); w.document.write(`<html><head><title>Cuaderno ${currentParcelaNombre}</title><style>body{font-family:Arial;padding:20px}.labor-item{border:1px solid #ccc;margin-bottom:15px;padding:10px;border-radius:8px}.fecha{font-weight:bold;color:#f97316}</style></head><body><h2>Cuaderno de Campo - ${currentParcelaNombre}</h2>${cont.outerHTML}</body></html>`); w.document.close(); w.print(); }
-
+    async function cargarHistorial() { listaLaboresDiv.innerHTML = '<div style="text-align:center;">Cargando...</div>'; try { const res = await fetch(`/api/eventos?parcela_id=${encodeURIComponent(currentParcelaId)}`); const labores = await res.json(); if (!Array.isArray(labores)) throw new Error(); if (labores.length === 0) { listaLaboresDiv.innerHTML = '<div style="text-align:center; color:#94a3b8;">No hay registros aún.</div>'; return; } let html = ''; labores.forEach(lab => { html += `<div class="labor-item" data-id="${lab.id}"><div class="fecha">?? ${lab.fecha}</div><div><strong>${lab.tipo}</strong> ${lab.insumo ? `· ${lab.insumo} (${lab.dosis})` : ''}</div><div>?? ${lab.operario || '—'}</div><div class="observaciones">?? ${lab.observaciones || ''}</div><div class="labor-actions"><button onclick="eliminarLabor(${lab.id})"><i class="fas fa-trash-alt"></i> Eliminar</button></div></div>`; }); listaLaboresDiv.innerHTML = html; } catch(err) { listaLaboresDiv.innerHTML = '<div style="color:#ef4444;">Error al cargar historial.</div>'; } }
+    async function guardarLabor(event) { event.preventDefault(); const data = { parcela_id: currentParcelaId, fecha: document.getElementById('labor-fecha').value, tipo: document.getElementById('labor-tipo').value, insumo: document.getElementById('labor-insumo').value, dosis: document.getElementById('labor-dosis').value, operario: document.getElementById('labor-operario').value, observaciones: document.getElementById('labor-obs').value, cultivo: document.getElementById('cultivo-select').value }; try { const res = await fetch('/api/eventos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); if (res.ok) { alert("Registro guardado"); formLabor.reset(); document.getElementById('labor-fecha').valueAsDate = new Date(); cargarHistorial(); } else { const err = await res.json(); alert("Error: " + err.error); } } catch(err) { alert("Error de conexión"); } }
+    async function eliminarLabor(id) { if (!confirm("¿Eliminar este registro?")) return; try { const res = await fetch(`/api/eventos/${id}`, { method: 'DELETE' }); if (res.ok) cargarHistorial(); else alert("No se pudo eliminar"); } catch(err) { alert("Error"); } }
+    function exportarCuadernoExcel() { fetch(`/api/eventos?parcela_id=${encodeURIComponent(currentParcelaId)}`).then(res=>res.json()).then(labores=>{ const ws = XLSX.utils.json_to_sheet(labores); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, `Cuaderno_${currentParcelaId}`); XLSX.writeFile(wb, `cuaderno_${currentParcelaId}.xlsx`); }).catch(err=>alert("Error al exportar")); }
+    function exportarCuadernoPDF() { const contenido = document.getElementById('lista-labores').cloneNode(true); const ventana = window.open('', '_blank'); ventana.document.write(`<html><head><title>Cuaderno de Campo - ${currentParcelaNombre}</title><style>body{font-family:Arial;padding:20px}.labor-item{border:1px solid #ccc;margin-bottom:15px;padding:10px;border-radius:8px}.fecha{font-weight:bold;color:#f97316}</style></head><body><h2>Cuaderno de Campo - ${currentParcelaNombre}</h2><p><strong>Productor:</strong> ${currentParcelaData.Productor}</p>${contenido.outerHTML}</body></html>`); ventana.document.close(); ventana.print(); }
+    
     btnCuaderno.addEventListener('click', abrirCuaderno);
     closeModalBtn.addEventListener('click', cerrarModal);
     formLabor.addEventListener('submit', guardarLabor);
@@ -1085,14 +891,15 @@
     document.getElementById('export-pdf-cuaderno').addEventListener('click', exportarCuadernoPDF);
     document.getElementById('chat-button').addEventListener('click', toggleChat);
     document.getElementById('export-chat-pdf-btn').addEventListener('click', exportChatToPDF);
-
+    document.getElementById('btn-excel-report').addEventListener('click', exportarExcel);
+    
     window.setModo = setModo;
     window.exportarExcel = exportarExcel;
     window.toggleChat = toggleChat;
     window.sendMessage = sendMessage;
     window.eliminarLabor = eliminarLabor;
     window.generarReportePDF = generarReportePDF;
-
+    
     cargarParcelas();
     document.getElementById('cultivo-select').addEventListener('change', () => actualizarRecomendacion());
     document.getElementById('fecha-siembra').addEventListener('change', () => actualizarRecomendacion());

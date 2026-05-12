@@ -543,7 +543,7 @@
     document.getElementById('fecha-input').valueAsDate = new Date();
     document.getElementById('fecha-siembra').valueAsDate = new Date(Date.now() - 45*86400000);
     
-    // Tooltip mejorado con mayor visibilidad y posición fija al navegar
+    // Tooltip mejorado
     const tooltipConfig = { 
         trigger: 'axis', 
         axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(249,115,22,0.2)' } }, 
@@ -555,9 +555,29 @@
         extraCssText: 'box-shadow: 0 6px 20px rgba(0,0,0,0.5); backdrop-filter: blur(4px);',
         confine: true
     };
-    const legendBottom = { orient: 'horizontal', left: 'center', bottom: 0, textStyle: { color: '#cbd5e1', fontSize: 10 }, itemWidth: 25, itemHeight: 2, icon: 'rect' };
-    // DataZoom para navegación fluida
-    const dataZoomConfig = [{ type: 'slider', start: 0, end: 100, bottom: 10, height: 20, borderColor: '#334155', fillerColor: 'rgba(249,115,22,0.2)', handleStyle: { color: '#f97316' } }];
+    
+    // Leyenda ahora en la parte superior (top) para evitar superposición con el slider
+    const legendTop = { 
+        orient: 'horizontal', 
+        left: 'center', 
+        top: 5, 
+        textStyle: { color: '#cbd5e1', fontSize: 10 }, 
+        itemWidth: 25, 
+        itemHeight: 2, 
+        icon: 'rect' 
+    };
+    
+    // DataZoom (slider de fechas) más abajo y más delgado
+    const dataZoomConfig = [{ 
+        type: 'slider', 
+        start: 0, 
+        end: 100, 
+        bottom: 10, 
+        height: 15, 
+        borderColor: '#334155', 
+        fillerColor: 'rgba(249,115,22,0.2)', 
+        handleStyle: { color: '#f97316' } 
+    }];
     
     var climateChart = echarts.init(document.getElementById('climate-chart'), 'dark');
     var forecastChart = echarts.init(document.getElementById('forecast-chart'), 'dark');
@@ -683,8 +703,8 @@
             const fechas = data.map(d => d.fecha.slice(5));
             forecastChart.setOption({
                 tooltip: tooltipConfig,
-                legend: { data: ['Precipitación (mm)', 'Balance hídrico (mm)', 'Temperatura mínima (°C)', 'Temperatura máxima (°C)', 'Humedad relativa (%)'], ...legendBottom },
-                grid: { top: 45, left: 65, right: 75, bottom: 80, containLabel: true },
+                legend: legendTop,
+                grid: { top: 55, left: 65, right: 75, bottom: 40, containLabel: true },
                 xAxis: { type: 'category', data: fechas, axisLabel: { rotate: 45, fontSize: 10, color: '#cbd5e1' } },
                 yAxis: [
                     { type: 'value', name: 'Precipitación / Balance (mm)', nameTextStyle: { color: '#94a3b8' }, splitLine: { lineStyle: { color: '#1e293b' } }, axisLabel: { color: '#cbd5e1' } },
@@ -730,8 +750,8 @@
             const fechas = data.fechas.map(f => f.split('-').slice(1).join('/'));
             climateChart.setOption({
                 tooltip: tooltipConfig,
-                legend: { data: ['Precipitación (mm)', 'Temperatura mínima (°C)', 'Temperatura máxima (°C)', 'Humedad relativa (%)'], ...legendBottom },
-                grid: { top: 45, left: 60, right: 70, bottom: 80, containLabel: true },
+                legend: legendTop,
+                grid: { top: 55, left: 60, right: 70, bottom: 40, containLabel: true },
                 xAxis: { type: 'category', data: fechas, axisLabel: { rotate: 45, fontSize: 9, color: '#cbd5e1' } },
                 yAxis: [
                     { type: 'value', name: 'Precipitación (mm)', nameTextStyle: { color: '#94a3b8' }, splitLine: { lineStyle: { color: '#1e293b' } }, axisLabel: { color: '#cbd5e1' } },

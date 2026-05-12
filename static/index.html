@@ -571,18 +571,19 @@
         const atributosDiv = document.getElementById('parcela-atributos');
         const infoCard = document.getElementById('parcela-info-card');
         
+        // Leer correctamente las columnas "C.I." y "N.Técnic"
         currentParcelaData = {
             Productor: props.Nombre || "—",
-            Cedula: props.C_I || "—",
-            Tecnico: props.N_Tecnico || "—",
+            Cedula: props["C.I."] || props.C_I || "—",
+            Tecnico: props["N.Técnic"] || props.N_Tecnico || "—",
             Rubro: props.Rubro || "—",
             Localidad: props.Localidad || "—"
         };
         
         const campos = [
             { key: "Nombre", label: "Productor", icon: "fas fa-user-circle", default: "—" },
-            { key: "C_I", label: "Cédula", icon: "fas fa-id-card", default: "—" },
-            { key: "N_Tecnico", label: "Técnico", icon: "fas fa-chalkboard-user", default: "—" },
+            { key: "C.I.", label: "Cédula", icon: "fas fa-id-card", default: "—" },
+            { key: "N.Técnic", label: "Técnico", icon: "fas fa-chalkboard-user", default: "—" },
             { key: "Rubro", label: "Rubro", icon: "fas fa-seedling", default: "—" },
             { key: "Localidad", label: "Localidad", icon: "fas fa-map-pin", default: "—" }
         ];

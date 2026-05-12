@@ -389,6 +389,30 @@
             color: #e2e8f0;
             word-break: break-word;
         }
+        /* Dashboard stats */
+        .rubro-stats {
+            font-size: 0.75rem;
+            background: #0f172a;
+            border-radius: 16px;
+            padding: 10px;
+            margin-top: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .rubro-stats div {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .rubro-name-info {
+            margin-top: 6px;
+            color: #94a3b8;
+            font-size: 0.7rem;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -402,6 +426,19 @@
         <p style="font-size: 10px; margin-top: 4px;">Monitoreo de precisión en cultivos frutihortícolas</p>
     </div>
     <div class="content">
+        <!-- DASHBOARD: FILTRO POR RUBRO Y ESTADÍSTICAS -->
+        <div class="control-card" style="margin-bottom: 20px;">
+            <label><i class="fas fa-chart-pie"></i> DASHBOARD · FILTRO POR RUBRO</label>
+            <select id="rubro-filter" style="margin-bottom: 8px;">
+                <option value="todos">📊 Todos los rubros</option>
+            </select>
+            <div class="rubro-stats">
+                <div><i class="fas fa-map-marker-alt"></i> Parcelas: <span id="stats-parcelas">0</span></div>
+                <div><i class="fas fa-users"></i> Productores: <span id="stats-productores">0</span></div>
+            </div>
+            <div id="rubro-name-info" class="rubro-name-info"></div>
+        </div>
+
         <div class="control-card">
             <label><i class="fas fa-seedling"></i> CULTIVO</label>
             <select id="cultivo-select">
@@ -540,10 +577,15 @@
     let currentParcelaNombre = "";
     let currentParcelaData = {};
     
+    // Variables para el filtro por rubro
+    let fullGeoJsonData = null;
+    let currentFilter = 'todos';
+    let currentLayer = null;
+    
     document.getElementById('fecha-input').valueAsDate = new Date();
     document.getElementById('fecha-siembra').valueAsDate = new Date(Date.now() - 45*86400000);
     
-    // Tooltip mejorado con mayor visibilidad y posición fija al navegar
+    // Tooltip mejorado
     const tooltipConfig = { 
         trigger: 'axis', 
         axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(249,115,22,0.2)' } }, 
@@ -556,7 +598,6 @@
         confine: true
     };
     const legendBottom = { orient: 'horizontal', left: 'center', bottom: 0, textStyle: { color: '#cbd5e1', fontSize: 10 }, itemWidth: 25, itemHeight: 2, icon: 'rect' };
-    // DataZoom para navegación fluida
     const dataZoomConfig = [{ type: 'slider', start: 0, end: 100, bottom: 10, height: 20, borderColor: '#334155', fillerColor: 'rgba(249,115,22,0.2)', handleStyle: { color: '#f97316' } }];
     
     var climateChart = echarts.init(document.getElementById('climate-chart'), 'dark');
@@ -603,25 +644,92 @@
         document.getElementById('parcela-info-card').style.display = 'block';
     }
     
+    // Cargar rubros únicos desde el GeoJSON
+    function cargarRubrosUnicos(geojson) {
+        const rubrosSet = new Set();
+        geojson.features.forEach(feature => {
+            let rubro = feature.properties?.Rubro;
+            if (rubro && rubro.trim() !== "") rubrosSet.add(rubro);
+        });
+        const rubrosOrdenados = Array.from(rubrosSet).sort();
+        const select = document.getElementById('rubro-filter');
+        // Limpiar opciones excepto la primera "Todos"
+        while (select.options.length > 1) select.remove(1);
+        rubrosOrdenados.forEach(rubro => {
+            const option = document.createElement('option');
+            option.value = rubro;
+            option.textContent = `🌾 ${rubro}`;
+            select.appendChild(option);
+        });
+        select.addEventListener('change', (e) => {
+            currentFilter = e.target.value;
+            actualizarEstadisticasYMapa(currentFilter);
+        });
+    }
+    
+    // Actualizar estadísticas y filtrar mapa
+    function actualizarEstadisticasYMapa(rubro) {
+        if (!fullGeoJsonData) return;
+        
+        // Filtrar features
+        const featuresFiltrados = fullGeoJsonData.features.filter(feature => {
+            if (rubro === 'todos') return true;
+            const featureRubro = feature.properties?.Rubro;
+            return featureRubro === rubro;
+        });
+        
+        // Estadísticas
+        const totalParcelas = featuresFiltrados.length;
+        const productoresUnicos = new Set();
+        featuresFiltrados.forEach(f => {
+            const nombre = f.properties?.Nombre;
+            if (nombre && nombre.trim()) productoresUnicos.add(nombre);
+        });
+        document.getElementById('stats-parcelas').innerText = totalParcelas;
+        document.getElementById('stats-productores').innerText = productoresUnicos.size;
+        document.getElementById('rubro-name-info').innerHTML = rubro !== 'todos' ? `<i class="fas fa-tag"></i> Rubro: ${rubro}` : 'Mostrando todos los rubros';
+        
+        // Recrear capa en el mapa
+        if (currentLayer) map.removeLayer(currentLayer);
+        
+        const geoJsonFiltrado = {
+            type: 'FeatureCollection',
+            features: featuresFiltrados
+        };
+        
+        currentLayer = L.geoJSON(geoJsonFiltrado, {
+            style: { color: "#f97316", weight: 2, fillOpacity: 0.1, dashArray: '5,5' },
+            onEachFeature: (f, l) => {
+                l.on('click', () => {
+                    currentFeature = f;
+                    currentParcelaId = f.id || f.properties?.id || `parcela_${Date.now()}`;
+                    currentParcelaNombre = f.properties?.Nombre || f.properties?.NOMBRE || "Parcela sin nombre";
+                    mostrarAtributosParcela(f);
+                    actualizarTodo();
+                });
+            }
+        }).addTo(map);
+        
+        // Ajustar vista al nuevo conjunto
+        if (featuresFiltrados.length > 0) {
+            const group = L.featureGroup();
+            featuresFiltrados.forEach(f => {
+                const coords = f.geometry.coordinates[0];
+                const latLngs = coords.map(c => [c[1], c[0]]);
+                group.addLayer(L.polygon(latLngs));
+            });
+            map.fitBounds(group.getBounds());
+        }
+    }
+    
     async function cargarParcelas() {
         try {
             const res = await fetch('/api/parcelas');
             if (!res.ok) throw new Error('Error al cargar parcelas');
             const data = await res.json();
-            const geoJsonLayer = L.geoJSON(data, {
-                style: { color: "#f97316", weight: 2, fillOpacity: 0.1, dashArray: '5,5' },
-                onEachFeature: (f, l) => {
-                    l.on('click', () => {
-                        currentFeature = f;
-                        currentParcelaId = f.id || f.properties?.id || `parcela_${Date.now()}`;
-                        currentParcelaNombre = f.properties?.Nombre || f.properties?.NOMBRE || "Parcela sin nombre";
-                        document.getElementById('btn-cuaderno').disabled = false;
-                        mostrarAtributosParcela(f);
-                        actualizarTodo();
-                    });
-                }
-            }).addTo(map);
-            map.fitBounds(geoJsonLayer.getBounds());
+            fullGeoJsonData = data;
+            cargarRubrosUnicos(data);
+            actualizarEstadisticasYMapa('todos');
         } catch(e) { console.error(e); alert("No se pudieron cargar las parcelas. ¿El servidor está corriendo?"); }
     }
     

@@ -419,7 +419,7 @@
                 <div><label>?? SIEMBRA</label><input type="date" id="fecha-siembra"></div>
                 <div><label>??? MONITOREO</label><input type="date" id="fecha-input"></div>
             </div>
-            <label>??? VARIEDAD / HÍBRIDO</label><input type="text" id="nombre-variedad" placeholder="Ej: Elpida, Valero, Spunta">
+            <label>?? VARIEDAD / HÍBRIDO</label><input type="text" id="nombre-variedad" placeholder="Ej: Elpida, Valero, Spunta">
             <label>?? ÍNDICE DE ANÁLISIS</label>
             <div class="mode-selector">
                 <button class="mode-btn active" onclick="setModo('NDVI',this)">NDVI</button>
@@ -441,7 +441,7 @@
         <div id="helada-banner-container"></div>
 
         <span class="section-title"><i class="fas fa-chart-simple"></i> ESTADO DEL CULTIVO</span>
-        <div id="result-container" class="metric-card"><div style="text-align:center; padding:20px;">??? Seleccione una parcela en el mapa</div></div>
+        <div id="result-container" class="metric-card"><div style="text-align:center; padding:20px;">?? Seleccione una parcela en el mapa</div></div>
 
         <span class="section-title"><i class="fas fa-robot"></i> RECOMENDACIÓN INTELIGENTE</span>
         <div id="recomendacion-container" class="recomendacion-card">?? Selecciona parcela y fecha de siembra.</div>
@@ -502,7 +502,7 @@
             <input type="hidden" id="parcela-id-input">
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                 <div><label>?? Fecha</label><input type="date" id="labor-fecha" required></div>
-                <div><label>????? Operario</label><input type="text" id="labor-operario" placeholder="Nombre"></div>
+                <div><label>?? Operario</label><input type="text" id="labor-operario" placeholder="Nombre"></div>
                 <div><label>?? Tipo de labor</label><select id="labor-tipo" required>
                     <option value="Preparación del suelo">Preparación del suelo</option>
                     <option value="Siembra">Siembra</option>
@@ -517,14 +517,14 @@
                 <div><label>?? Dosis / Cantidad</label><input type="text" id="labor-dosis" placeholder="Ej: 150 kg/ha"></div>
                 <div style="grid-column:span 2;"><label>?? Observaciones</label><textarea id="labor-obs" rows="2" style="width:100%; background:#1e293b; border:1px solid var(--border); border-radius:14px; padding:8px;"></textarea></div>
             </div>
-            <button type="submit" style="background:var(--primary); width:100%; margin-top:20px; padding:12px; border-radius:24px; font-weight:bold;">?? Guardar registro</button>
+            <button type="submit" style="background:var(--primary); width:100%; margin-top:20px; padding:12px; border-radius:24px; font-weight:bold;">? Guardar registro</button>
         </form>
         <hr style="margin:20px 0; border-color:var(--border);">
         <h4><i class="fas fa-history"></i> Registros anteriores</h4>
         <div id="lista-labores" style="max-height:300px; overflow-y:auto; margin-top:12px;"></div>
         <div style="display:flex; gap:12px; margin-top:20px;">
             <button id="export-excel-cuaderno" class="btn-excel" style="background:#2ecc71;">?? Exportar Reporte en Excel</button>
-            <button id="export-pdf-cuaderno" class="btn-excel" style="background:#e67e22;">??? Exportar Reporte en PDF</button>
+            <button id="export-pdf-cuaderno" class="btn-excel" style="background:#e67e22;">?? Exportar Reporte en PDF</button>
         </div>
     </div>
 </div>
@@ -538,7 +538,7 @@
     var googleSat = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { attribution: 'Google Satélite', maxZoom: 20 }).addTo(map);
     var esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri', maxZoom: 19 });
     var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 });
-    L.control.layers({ "??? Google Satélite": googleSat, "?? ESRI Satélite": esriSat, "?? OpenStreetMap": osm }, null, { position: 'topright' }).addTo(map);
+    L.control.layers({ "??? Google Satélite": googleSat, "?? ESRI Satélite": esriSat, "??? OpenStreetMap": osm }, null, { position: 'topright' }).addTo(map);
     
     var frostLayer = null;
     var currentFeature = null;
@@ -642,8 +642,12 @@
         loading.style.display = 'block';
         try {
             await Promise.all([actualizarAnalisis(), cargarPronostico(), cargarClimaHistorico(), actualizarRecomendacion()]);
-        } catch(e) { console.error(e); setTimeout(() => loading.style.display = 'none', 1000); return; }
-        loading.style.display = 'none';
+        } catch(e) {
+            console.error(e);
+            document.getElementById('result-container').innerHTML = `<div style="color:#ef4444; padding:20px;">? Error al cargar datos: ${e.message}</div>`;
+        } finally {
+            loading.style.display = 'none';
+        }
     }
     
     async function actualizarAnalisis() {
@@ -653,7 +657,11 @@
             body: JSON.stringify({ feature: currentFeature, tipo: modoActual, fecha })
         });
         const data = await res.json();
-        if (data.error) throw new Error(data.error);
+        if (data.error) {
+            document.getElementById('result-container').innerHTML = `<div style="color:#ef4444; padding:20px;">?? Error: ${data.error}</div>`;
+            if (window.satLayerActual) map.removeLayer(window.satLayerActual);
+            return;
+        }
         if (window.satLayerActual) map.removeLayer(window.satLayerActual);
         window.satLayerActual = L.tileLayer(data.tile_url, { opacity: 0.9 }).addTo(map);
         const haTotal = data.desglose.reduce((a,b)=>a+b.ha,0);
@@ -707,7 +715,7 @@
                 boxes += `<div class="forecast-box ${d.alerta_helada ? 'helada' : ''}">
                             <span><strong>${d.fecha.slice(5)}</strong></span>
                             <b>${d.temp_min_c}° / ${d.temp_max_c}°</b>
-                            <span>??? ${d.precipitacion_mm} mm</span>
+                            <span>?? ${d.precipitacion_mm} mm</span>
                             <span style="display:block; font-size:0.65rem;">?? ${d.balance_mm} mm</span>
                             <span>?? Humedad: ${d.humedad_relativa_max}%</span>
                             ${d.alerta_helada ? '<i class="fas fa-icicles" style="color:#ef4444;"></i> <span style="color:#ef4444;">Helada!</span>' : ''}
@@ -715,14 +723,14 @@
             });
             document.getElementById('forecast-data-boxes').innerHTML = boxes;
         } catch(err) {
-            errorDiv.innerText = '?? No se pudo cargar el pronóstico. Verifique la conexión con el servidor.';
+            errorDiv.innerText = '? No se pudo cargar el pronóstico. Verifique la conexión con el servidor.';
             errorDiv.style.display = 'block';
         }
     }
     
     async function cargarClimaHistorico() {
         try {
-            const res = await fetch('/api/clima_historico', {
+            const res = await fetch('/api/historial_clima', {
                 method:'POST', headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({ feature: currentFeature })
             });
@@ -781,7 +789,7 @@
                 document.getElementById('toggle-frost-btn').style.borderColor = '#ef4444';
                 document.getElementById('toggle-frost-btn').innerHTML = `<i class="fas fa-temperature-low"></i> Capa activa (${data.fecha})`;
             } else throw new Error('Respuesta sin tile_url');
-        } catch(e) { alert('? ' + e.message); } finally { document.getElementById('loading').style.display = 'none'; }
+        } catch(e) { alert('?? ' + e.message); } finally { document.getElementById('loading').style.display = 'none'; }
     });
     
     function exportarExcel() {
@@ -815,14 +823,14 @@
             </table>
         `;
         
-        const contenido = `<html><head><title>Reporte Técnico - FrutihorMonitor</title><style>body{font-family:'Inter',Arial,sans-serif;padding:30px;background:white;color:#0f172a;}h1{color:#f97316;}.section{margin-bottom:30px;border-bottom:1px solid #ccc;padding-bottom:15px;}.forecast-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}.forecast-box{background:#f1f5f9;padding:8px;border-radius:12px;text-align:center;}.helada{border-left:4px solid #ef4444;background:#fee2e2;}</style></head><body><h1>?? Reporte Técnico FrutihorMonitor PRO</h1><p><strong>Parcela:</strong> ${currentParcelaNombre}</p><p><strong>Fecha de generación:</strong> ${new Date().toLocaleString()}</p><div class="section"><h2>?? Datos del Productor</h2>${productorData}</div><div class="section"><h2>?? Datos del Cultivo</h2><p><strong>Cultivo:</strong> ${cultivo}</p><p><strong>Variedad:</strong> ${variedad}</p><p><strong>Fecha de siembra:</strong> ${fechaSiembra}</p><p><strong>Fecha de monitoreo satelital:</strong> ${fechaMonitoreo}</p></div><div class="section"><h2>??? Análisis de Índices</h2>${analisisHtml}</div><div class="section"><h2>?? Recomendación Inteligente</h2>${recomendacionHtml}</div><div class="section"><h2>?? Historial Climático (últimos 30 días)</h2>${climateChartImg || '<p>Gráfico no disponible</p>'}</div><div class="section"><h2>??? Pronóstico Agroclimático 10 días</h2>${forecastChartImg || '<p>Gráfico no disponible</p>'}<div class="forecast-grid">${pronosticoHtml}</div></div><footer style="margin-top:40px; font-size:10px; color:#64748b; text-align:center;">Generado por FrutihorMonitor · NABLA CONSULTORES S.R.L</footer></body></html>`;
+        const contenido = `<html><head><title>Reporte Técnico - FrutihorMonitor</title><style>body{font-family:'Inter',Arial,sans-serif;padding:30px;background:white;color:#0f172a;}h1{color:#f97316;}.section{margin-bottom:30px;border-bottom:1px solid #ccc;padding-bottom:15px;}.forecast-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}.forecast-box{background:#f1f5f9;padding:8px;border-radius:12px;text-align:center;}.helada{border-left:4px solid #ef4444;background:#fee2e2;}</style></head><body><h1>?? Reporte Técnico FrutihorMonitor PRO</h1><p><strong>Parcela:</strong> ${currentParcelaNombre}</p><p><strong>Fecha de generación:</strong> ${new Date().toLocaleString()}</p><div class="section"><h2>????? Datos del Productor</h2>${productorData}</div><div class="section"><h2>?? Datos del Cultivo</h2><p><strong>Cultivo:</strong> ${cultivo}</p><p><strong>Variedad:</strong> ${variedad}</p><p><strong>Fecha de siembra:</strong> ${fechaSiembra}</p><p><strong>Fecha de monitoreo satelital:</strong> ${fechaMonitoreo}</p></div><div class="section"><h2>?? Análisis de Índices</h2>${analisisHtml}</div><div class="section"><h2>?? Recomendación Inteligente</h2>${recomendacionHtml}</div><div class="section"><h2>??? Historial Climático (últimos 30 días)</h2>${climateChartImg || '<p>Gráfico no disponible</p>'}</div><div class="section"><h2>? Pronóstico Agroclimático 10 días</h2>${forecastChartImg || '<p>Gráfico no disponible</p>'}<div class="forecast-grid">${pronosticoHtml}</div></div><footer style="margin-top:40px; font-size:10px; color:#64748b; text-align:center;">Generado por FrutihorMonitor · NABLA CONSULTORES S.R.L</footer></body></html>`;
         const ventana = window.open('', '_blank');
         ventana.document.write(contenido);
         ventana.document.close();
         ventana.print();
     }
     
-    // CHAT con el backend seguro (Groq desde el servidor)
+    // CHAT con el backend (endpoint /api/chat)
     let chatHistory = [{ role: "system", content: "Eres Tom, experto en tomate, cebolla, papa. Ayudas con heladas, fenología y manejo integrado." }];
     function toggleChat() { document.getElementById('chat-window').classList.toggle('open'); }
     function addMessage(text, isUser) { const container = document.getElementById('chat-messages'); const div = document.createElement('div'); div.className = isUser ? 'user-message' : 'bot-message'; div.innerText = text; container.appendChild(div); container.scrollTop = container.scrollHeight; }
@@ -853,10 +861,10 @@
         const contexto = `Cultivo: ${document.getElementById('cultivo-select').value}, Fenología según siembra: ${document.getElementById('fecha-siembra').value}, Heladas pronosticadas: ${currentPronostico.some(d=>d.alerta_helada)}. Datos del productor: ${productorInfo}`;
         
         try {
-            const res = await fetch('/api/chat-groq', {
+            const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text, contexto: contexto })
+                body: JSON.stringify({ mensaje: text, contexto: contexto })
             });
             const data = await res.json();
             const reply = data.respuesta || data.error || "Lo siento, no pude procesar tu consulta.";
@@ -869,7 +877,7 @@
         }
     }
     
-    // CUADERNO DE CAMPO (todas las funciones permanecen igual, solo se ajustan las URLs relativas)
+    // CUADERNO DE CAMPO
     const modalCuaderno = document.getElementById('modal-cuaderno');
     const btnCuaderno = document.getElementById('btn-cuaderno');
     const closeModalBtn = document.getElementById('close-modal');
@@ -878,7 +886,7 @@
     const listaLaboresDiv = document.getElementById('lista-labores');
     function abrirCuaderno() { if (!currentParcelaId) { alert("Primero selecciona una parcela en el mapa."); return; } parcelaInfoDiv.innerHTML = `<strong>?? Parcela:</strong> ${currentParcelaNombre || currentParcelaId}<br><strong>Productor:</strong> ${currentParcelaData.Productor}`; document.getElementById('parcela-id-input').value = currentParcelaId; document.getElementById('labor-fecha').valueAsDate = new Date(); cargarHistorial(); modalCuaderno.style.display = 'flex'; }
     function cerrarModal() { modalCuaderno.style.display = 'none'; }
-    async function cargarHistorial() { listaLaboresDiv.innerHTML = '<div style="text-align:center;">Cargando...</div>'; try { const res = await fetch(`/api/eventos?parcela_id=${encodeURIComponent(currentParcelaId)}`); const labores = await res.json(); if (!Array.isArray(labores)) throw new Error(); if (labores.length === 0) { listaLaboresDiv.innerHTML = '<div style="text-align:center; color:#94a3b8;">No hay registros aún.</div>'; return; } let html = ''; labores.forEach(lab => { html += `<div class="labor-item" data-id="${lab.id}"><div class="fecha">?? ${lab.fecha}</div><div><strong>${lab.tipo}</strong> ${lab.insumo ? `· ${lab.insumo} (${lab.dosis})` : ''}</div><div>?? ${lab.operario || '—'}</div><div class="observaciones">?? ${lab.observaciones || ''}</div><div class="labor-actions"><button onclick="eliminarLabor(${lab.id})"><i class="fas fa-trash-alt"></i> Eliminar</button></div></div>`; }); listaLaboresDiv.innerHTML = html; } catch(err) { listaLaboresDiv.innerHTML = '<div style="color:#ef4444;">Error al cargar historial.</div>'; } }
+    async function cargarHistorial() { listaLaboresDiv.innerHTML = '<div style="text-align:center;">Cargando...</div>'; try { const res = await fetch(`/api/eventos?parcela_id=${encodeURIComponent(currentParcelaId)}`); const labores = await res.json(); if (!Array.isArray(labores)) throw new Error(); if (labores.length === 0) { listaLaboresDiv.innerHTML = '<div style="text-align:center; color:#94a3b8;">No hay registros aún.</div>'; return; } let html = ''; labores.forEach(lab => { html += `<div class="labor-item" data-id="${lab.id}"><div class="fecha">?? ${lab.fecha}</div><div><strong>${lab.tipo_labor}</strong> ${lab.insumo ? `· ${lab.insumo} (${lab.dosis})` : ''}</div><div>?? ${lab.operario || '—'}</div><div class="observaciones">?? ${lab.observaciones || ''}</div><div class="labor-actions"><button onclick="eliminarLabor(${lab.id})"><i class="fas fa-trash-alt"></i> Eliminar</button></div></div>`; }); listaLaboresDiv.innerHTML = html; } catch(err) { listaLaboresDiv.innerHTML = '<div style="color:#ef4444;">Error al cargar historial.</div>'; } }
     async function guardarLabor(event) { event.preventDefault(); const data = { parcela_id: currentParcelaId, fecha: document.getElementById('labor-fecha').value, tipo: document.getElementById('labor-tipo').value, insumo: document.getElementById('labor-insumo').value, dosis: document.getElementById('labor-dosis').value, operario: document.getElementById('labor-operario').value, observaciones: document.getElementById('labor-obs').value, cultivo: document.getElementById('cultivo-select').value }; try { const res = await fetch('/api/eventos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); if (res.ok) { alert("Registro guardado"); formLabor.reset(); document.getElementById('labor-fecha').valueAsDate = new Date(); cargarHistorial(); } else { const err = await res.json(); alert("Error: " + err.error); } } catch(err) { alert("Error de conexión"); } }
     async function eliminarLabor(id) { if (!confirm("¿Eliminar este registro?")) return; try { const res = await fetch(`/api/eventos/${id}`, { method: 'DELETE' }); if (res.ok) cargarHistorial(); else alert("No se pudo eliminar"); } catch(err) { alert("Error"); } }
     function exportarCuadernoExcel() { fetch(`/api/eventos?parcela_id=${encodeURIComponent(currentParcelaId)}`).then(res=>res.json()).then(labores=>{ const ws = XLSX.utils.json_to_sheet(labores); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, `Cuaderno_${currentParcelaId}`); XLSX.writeFile(wb, `cuaderno_${currentParcelaId}.xlsx`); }).catch(err=>alert("Error al exportar")); }

@@ -12,12 +12,14 @@ from datetime import datetime, timedelta
 app = Flask(__name__, static_folder='static', static_url_path='')
 CORS(app)
 
-# ---------- Inicialización de Earth Engine (robusta) ----------
+# ---------- Inicialización de Earth Engine (robusta con cuenta de servicio) ----------
 ee_initialized = False
+ee_error_msg = None
+
 try:
     json_creds = os.environ.get("EE_CREDENTIALS")
     if json_creds:
-        # Cargar el JSON como diccionario
+        # Cargar el JSON como diccionario (debe estar minificado en una línea)
         creds = json.loads(json_creds)
         private_key = creds["private_key"]
         client_email = creds["client_email"]
@@ -27,11 +29,12 @@ try:
         print("✅ Conectado a Earth Engine con cuenta de servicio (key_data)")
         ee_initialized = True
     else:
-        # Fallback: modo local (desarrollo)
+        # Modo desarrollo local (sin variables)
         ee.Initialize()
-        print("✅ Conectado a Earth Engine en modo local")
+        print("✅ Conectado a Earth Engine en modo local (desarrollo)")
         ee_initialized = True
 except Exception as e:
+    ee_error_msg = str(e)
     print(f"❌ Error en Earth Engine: {e}")
     print("⚠️ Las funciones de índices satelitales y mapa de heladas no estarán disponibles.")
     ee_initialized = False
@@ -68,13 +71,12 @@ init_db()
 def servir_frontend():
     return send_from_directory('static', 'index.html')
 
-# ---------- Endpoint: parcelas (corregido: sin transformación) ----------
+# ---------- Endpoint: parcelas ----------
 @app.route('/api/parcelas')
 def obtener_parcelas():
     try:
         with open(PATH_GEOJSON, encoding='utf-8') as f:
             data = json.load(f)
-        # Asegurar que cada feature tenga un campo 'id'
         for feature in data['features']:
             if 'id' not in feature:
                 props = feature.get('properties', {})
@@ -82,6 +84,15 @@ def obtener_parcelas():
         return jsonify(data)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# ---------- Endpoint: diagnóstico de Earth Engine ----------
+@app.route('/api/ee_status')
+def ee_status():
+    return jsonify({
+        "ee_initialized": ee_initialized,
+        "creds_present": bool(os.environ.get("EE_CREDENTIALS")),
+        "error_message": ee_error_msg if not ee_initialized else None
+    })
 
 # ---------- Endpoint: historial climático ----------
 @app.route('/api/historial_clima', methods=['POST'])
@@ -165,11 +176,11 @@ def obtener_historial_clima():
         print("Error en /api/historial_clima:", str(e))
         return jsonify({"error": str(e)}), 500
 
-# ---------- Endpoint: análisis NDVI/IC/NDWI (corregido: manejo de MultiPolygon) ----------
+# ---------- Endpoint: análisis NDVI/IC/NDWI (con mejor manejo de errores) ----------
 @app.route('/api/analizar', methods=['POST'])
 def analizar():
     if not ee_initialized:
-        return jsonify({"error": "Earth Engine no está disponible. Verifica la autenticación."}), 503
+        return jsonify({"error": f"Earth Engine no disponible. Motivo: {ee_error_msg or 'No inicializado'}"}), 503
     try:
         req = request.json
         feature = req['feature']
@@ -179,7 +190,7 @@ def analizar():
         fecha_inicio = (fecha_target - timedelta(days=15)).strftime('%Y-%m-%d')
         fecha_fin = (fecha_target + timedelta(days=5)).strftime('%Y-%m-%d')
         
-        # Extraer coordenadas correctamente (Polygon o MultiPolygon)
+        # Extraer coordenadas
         geom = feature['geometry']
         if geom['type'] == 'Polygon':
             coords = geom['coordinates'][0]
@@ -195,8 +206,12 @@ def analizar():
                   .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 30))
                   .sort('CLOUDY_PIXEL_PERCENTAGE')
                   .first())
-        if not imagen.getInfo():
-            return jsonify({"error": "Sin imágenes disponibles"}), 404
+        
+        # Verificar si existe imagen
+        img_info = imagen.getInfo()
+        if not img_info:
+            return jsonify({"error": "No hay imágenes disponibles para la fecha seleccionada (nubes o falta de cobertura)"}), 404
+        
         if tipo == 'NDVI':
             indice = imagen.normalizedDifference(['B8', 'B4']).rename('NDVI').clip(roi)
             viz = {'min': 0.1, 'max': 0.9, 'palette': ['#ff1744', '#ffff00', '#00e676', '#1b5e20']}
@@ -215,6 +230,7 @@ def analizar():
             umbrales = [0.1, 0.4]
             etiquetas = ["Suelo Seco", "Suelo Saturado", "Agua Profunda"]
             colores = ["#ffffff", "#81d4fa", "#01579b"]
+        
         m1 = indice.lt(umbrales[0])
         m2 = indice.gte(umbrales[0]).And(indice.lt(umbrales[1]))
         m3 = indice.gte(umbrales[1])
@@ -234,9 +250,9 @@ def analizar():
         })
     except Exception as e:
         print("Error en /api/analizar:", str(e))
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Error interno: {str(e)}"}), 500
 
-# ---------- Mapa de heladas (ya correcto, se mantiene) ----------
+# ---------- Mapa de heladas ----------
 @app.route('/api/mapa_heladas', methods=['POST'])
 def mapa_heladas():
     if not ee_initialized:
@@ -401,7 +417,7 @@ def recomendacion():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ---------- Chat ----------
+# ---------- Chat con Groq ----------
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
 @app.route('/api/chat', methods=['POST'])
@@ -409,13 +425,15 @@ def chat():
     try:
         data = request.json
         mensaje_usuario = data.get('mensaje')
-        historial = data.get('historial', [])
+        contexto = data.get('contexto', '')
         if not mensaje_usuario:
             return jsonify({"error": "Mensaje vacío"}), 400
         if not GROQ_API_KEY:
             return jsonify({"error": "API Key de Groq no configurada"}), 500
-        contexto = f"Cultivo: {data.get('cultivo', 'desconocido')}, Heladas pronosticadas: {data.get('alerta_helada', False)}"
-        messages = historial + [{"role": "user", "content": f"Contexto: {contexto}\nPregunta: {mensaje_usuario}"}]
+        messages = [
+            {"role": "system", "content": "Eres Tom, un asesor agronómico experto en cultivos frutihortícolas (tomate, cebolla, papa). Respondes de forma clara y práctica."},
+            {"role": "user", "content": f"Contexto: {contexto}\nPregunta: {mensaje_usuario}"}
+        ]
         headers = {"Content-Type": "application/json", "Authorization": f"Bearer {GROQ_API_KEY}"}
         payload = {"model": "llama-3.3-70b-versatile", "messages": messages, "temperature": 0.7}
         response = requests.post("https://api.groq.com/openai/v1/chat/completions", json=payload, headers=headers, timeout=30)
@@ -427,9 +445,9 @@ def chat():
         print("Error en chat:", str(e))
         return jsonify({"error": str(e)}), 500
 
-# ---------- Cuaderno de campo ----------
-@app.route('/api/cuaderno', methods=['GET'])
-def obtener_labores():
+# ---------- Cuaderno de campo (eventos agrícolas) ----------
+@app.route('/api/eventos', methods=['GET'])
+def obtener_eventos():
     parcela_id = request.args.get('parcela_id')
     if not parcela_id:
         return jsonify({"error": "Se requiere parcela_id"}), 400
@@ -442,10 +460,10 @@ def obtener_labores():
     labores = [dict(row) for row in rows]
     return jsonify(labores)
 
-@app.route('/api/cuaderno', methods=['POST'])
-def guardar_labor():
+@app.route('/api/eventos', methods=['POST'])
+def guardar_evento():
     data = request.json
-    required = ['parcela_id', 'fecha', 'tipo_labor']
+    required = ['parcela_id', 'fecha', 'tipo']
     for field in required:
         if field not in data:
             return jsonify({"error": f"Falta campo {field}"}), 400
@@ -455,7 +473,7 @@ def guardar_labor():
         INSERT INTO labores (parcela_id, fecha, tipo_labor, insumo, dosis, operario, observaciones)
         VALUES (?, ?, ?, ?, ?, ?, ?)
     ''', (
-        data['parcela_id'], data['fecha'], data['tipo_labor'],
+        data['parcela_id'], data['fecha'], data['tipo'],
         data.get('insumo', ''), data.get('dosis', ''),
         data.get('operario', ''), data.get('observaciones', '')
     ))
@@ -464,8 +482,8 @@ def guardar_labor():
     conn.close()
     return jsonify({"mensaje": "Labor guardada", "id": nuevo_id}), 201
 
-@app.route('/api/cuaderno/<int:id>', methods=['DELETE'])
-def eliminar_labor(id):
+@app.route('/api/eventos/<int:id>', methods=['DELETE'])
+def eliminar_evento(id):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("DELETE FROM labores WHERE id = ?", (id,))

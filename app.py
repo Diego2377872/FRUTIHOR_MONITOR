@@ -4,7 +4,6 @@ import requests
 import math
 import sqlite3
 import os
-import tempfile
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from datetime import datetime, timedelta
@@ -12,37 +11,40 @@ from datetime import datetime, timedelta
 app = Flask(__name__, static_folder='static', static_url_path='')
 CORS(app)
 
-# ---------- Inicialización de Earth Engine (robusta con cuenta de servicio) ----------
+# ---------- Forzar UTF-8 en todas las respuestas ----------
+@app.after_request
+def add_charset_header(response):
+    content_type = response.headers.get('Content-Type', '')
+    if 'text/' in content_type or 'application/json' in content_type:
+        if 'charset' not in content_type:
+            response.headers['Content-Type'] = content_type + '; charset=utf-8'
+    return response
+
+# ---------- Inicialización de Earth Engine (cuenta de servicio) ----------
 ee_initialized = False
 ee_error_msg = None
 
 try:
     json_creds = os.environ.get("EE_CREDENTIALS")
     if json_creds:
-        # Cargar el JSON como diccionario (debe estar minificado en una línea)
         creds = json.loads(json_creds)
         private_key = creds["private_key"]
         client_email = creds["client_email"]
-        # Usar key_data en lugar de archivo
         credentials = ee.ServiceAccountCredentials(client_email, key_data=private_key)
         ee.Initialize(credentials)
         print("✅ Conectado a Earth Engine con cuenta de servicio (key_data)")
         ee_initialized = True
     else:
-        # Modo desarrollo local (sin variables)
         ee.Initialize()
         print("✅ Conectado a Earth Engine en modo local (desarrollo)")
         ee_initialized = True
 except Exception as e:
     ee_error_msg = str(e)
     print(f"❌ Error en Earth Engine: {e}")
-    print("⚠️ Las funciones de índices satelitales y mapa de heladas no estarán disponibles.")
     ee_initialized = False
 
-# Ruta al GeoJSON
+# ---------- Rutas ----------
 PATH_GEOJSON = os.path.join(os.path.dirname(__file__), 'parcelas_.geojson')
-
-# ---------- Base de datos SQLite ----------
 DB_PATH = os.path.join(os.path.dirname(__file__), 'cuaderno_campo.db')
 
 def init_db():
@@ -66,12 +68,12 @@ def init_db():
 
 init_db()
 
-# ---------- Servir frontend ----------
 @app.route('/')
 def servir_frontend():
-    return send_from_directory('static', 'index.html')
+    resp = send_from_directory('static', 'index.html')
+    resp.headers['Content-Type'] = 'text/html; charset=utf-8'
+    return resp
 
-# ---------- Endpoint: parcelas ----------
 @app.route('/api/parcelas')
 def obtener_parcelas():
     try:
@@ -85,7 +87,6 @@ def obtener_parcelas():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ---------- Endpoint: diagnóstico de Earth Engine ----------
 @app.route('/api/ee_status')
 def ee_status():
     return jsonify({
@@ -94,7 +95,6 @@ def ee_status():
         "error_message": ee_error_msg if not ee_initialized else None
     })
 
-# ---------- Endpoint: historial climático ----------
 @app.route('/api/historial_clima', methods=['POST'])
 def obtener_historial_clima():
     try:
@@ -176,7 +176,6 @@ def obtener_historial_clima():
         print("Error en /api/historial_clima:", str(e))
         return jsonify({"error": str(e)}), 500
 
-# ---------- Endpoint: análisis NDVI/IC/NDWI (con mejor manejo de errores) ----------
 @app.route('/api/analizar', methods=['POST'])
 def analizar():
     if not ee_initialized:
@@ -190,7 +189,6 @@ def analizar():
         fecha_inicio = (fecha_target - timedelta(days=15)).strftime('%Y-%m-%d')
         fecha_fin = (fecha_target + timedelta(days=5)).strftime('%Y-%m-%d')
         
-        # Extraer coordenadas
         geom = feature['geometry']
         if geom['type'] == 'Polygon':
             coords = geom['coordinates'][0]
@@ -207,7 +205,6 @@ def analizar():
                   .sort('CLOUDY_PIXEL_PERCENTAGE')
                   .first())
         
-        # Verificar si existe imagen
         img_info = imagen.getInfo()
         if not img_info:
             return jsonify({"error": "No hay imágenes disponibles para la fecha seleccionada (nubes o falta de cobertura)"}), 404
@@ -224,7 +221,7 @@ def analizar():
             umbrales = [1.0, 2.0]
             etiquetas = ["Clorofila Baja", "Clorofila Media", "Clorofila Alta"]
             colores = ["#dce775", "#8bc34a", "#1b5e20"]
-        else:  # NDWI
+        else:
             indice = imagen.normalizedDifference(['B3', 'B8']).rename('NDWI').clip(roi)
             viz = {'min': -0.4, 'max': 0.4, 'palette': ['#ffffff', '#00b0ff', '#002f6c']}
             umbrales = [0.1, 0.4]
@@ -252,7 +249,6 @@ def analizar():
         print("Error en /api/analizar:", str(e))
         return jsonify({"error": f"Error interno: {str(e)}"}), 500
 
-# ---------- Mapa de heladas ----------
 @app.route('/api/mapa_heladas', methods=['POST'])
 def mapa_heladas():
     if not ee_initialized:
@@ -295,7 +291,6 @@ def mapa_heladas():
         print("❌ Error en mapa_heladas:", str(e))
         return jsonify({"error": str(e)}), 500
 
-# ---------- Pronóstico ----------
 @app.route('/api/pronostico', methods=['POST'])
 def obtener_pronostico():
     try:
@@ -357,7 +352,6 @@ def obtener_pronostico():
         print("Error en /api/pronostico:", str(e))
         return jsonify({"error": str(e)}), 500
 
-# ---------- Recomendación ----------
 @app.route('/api/recomendacion', methods=['POST'])
 def recomendacion():
     try:
@@ -417,7 +411,6 @@ def recomendacion():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ---------- Chat con Groq ----------
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
 @app.route('/api/chat', methods=['POST'])
@@ -445,7 +438,6 @@ def chat():
         print("Error en chat:", str(e))
         return jsonify({"error": str(e)}), 500
 
-# ---------- Cuaderno de campo (eventos agrícolas) ----------
 @app.route('/api/eventos', methods=['GET'])
 def obtener_eventos():
     parcela_id = request.args.get('parcela_id')
@@ -495,6 +487,5 @@ def eliminar_evento(id):
     else:
         return jsonify({"error": "Registro no encontrado"}), 404
 
-# ---------- Iniciar servidor ----------
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)

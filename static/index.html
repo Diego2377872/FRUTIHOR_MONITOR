@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FrutihorMonitor | Análisis Técnico y Heladas + Cuaderno de Campo</title>
+    <title>FrutihorMonitor | Anï¿½lisis Tï¿½cnico y Heladas + Cuaderno de Campo</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
@@ -404,7 +404,7 @@
             <img src="logo.png" alt="FrutihorMonitor Logo">
             FrutihorMonitor <span style="color:var(--primary)">PRO</span>
         </h2>
-        <p style="font-size: 10px; margin-top: 4px;">Monitoreo de precisión en cultivos frutihortícolas</p>
+        <p style="font-size: 10px; margin-top: 4px;">Monitoreo de precisiï¿½n en cultivos frutihortï¿½colas</p>
     </div>
     <div class="content">
         <div class="control-card">
@@ -418,14 +418,14 @@
                 <div><label>?? SIEMBRA</label><input type="date" id="fecha-siembra"></div>
                 <div><label>??? MONITOREO</label><input type="date" id="fecha-input"></div>
             </div>
-            <label>?? VARIEDAD / HÍBRIDO</label><input type="text" id="nombre-variedad" placeholder="Ej: Elpida, Valero, Spunta">
-            <label>?? ÍNDICE DE ANÁLISIS</label>
+            <label>?? VARIEDAD / Hï¿½BRIDO</label><input type="text" id="nombre-variedad" placeholder="Ej: Elpida, Valero, Spunta">
+            <label>?? ï¿½NDICE DE ANï¿½LISIS</label>
             <div class="mode-selector">
                 <button class="mode-btn active" onclick="setModo('NDVI',this)">NDVI</button>
                 <button class="mode-btn" onclick="setModo('IC',this)">IC</button>
                 <button class="mode-btn" onclick="setModo('NDWI',this)">NDWI</button>
             </div>
-            <button id="toggle-frost-btn" style="margin-top: 16px; background:#1e293b; border:1px solid var(--accent); padding:8px; border-radius:14px; width:100%; cursor:pointer;"><i class="fas fa-temperature-low"></i> Mostrar mapa de heladas (última noche)</button>
+            <button id="toggle-frost-btn" style="margin-top: 16px; background:#1e293b; border:1px solid var(--accent); padding:8px; border-radius:14px; width:100%; cursor:pointer;"><i class="fas fa-temperature-low"></i> Mostrar mapa de heladas (ï¿½ltima noche)</button>
         </div>
 
         <div id="parcela-info-card" class="parcela-info-card">
@@ -441,13 +441,13 @@
         <span class="section-title"><i class="fas fa-chart-simple"></i> ESTADO DEL CULTIVO</span>
         <div id="result-container" class="metric-card"><div style="text-align:center; padding:20px;">?? Seleccione una parcela en el mapa</div></div>
 
-        <span class="section-title"><i class="fas fa-robot"></i> RECOMENDACIÓN INTELIGENTE</span>
+        <span class="section-title"><i class="fas fa-robot"></i> RECOMENDACIï¿½N INTELIGENTE</span>
         <div id="recomendacion-container" class="recomendacion-card">?? Selecciona parcela y fecha de siembra.</div>
 
-        <span class="section-title"><i class="fas fa-cloud-moon-rain"></i> PRONÓSTICO AGROCLIMÁTICO (10 DÍAS)</span>
+        <span class="section-title"><i class="fas fa-cloud-moon-rain"></i> PRONï¿½STICO AGROCLIMï¿½TICO (10 Dï¿½AS)</span>
         <div class="chart-card">
             <div class="chart-header">
-                <button id="download-forecast-chart" class="download-chart-btn"><i class="fas fa-download"></i> Descargar gráfico</button>
+                <button id="download-forecast-chart" class="download-chart-btn"><i class="fas fa-download"></i> Descargar grï¿½fico</button>
             </div>
             <button id="toggle-forecast-labels" class="toggle-labels-btn"><i class="fas fa-tag"></i></button>
             <div class="chart-wrapper">
@@ -457,10 +457,10 @@
             <div class="forecast-grid" id="forecast-data-boxes"></div>
         </div>
 
-        <span class="section-title"><i class="fas fa-temperature-high"></i> HISTORIAL AGROCLIMÁTICO (30 DÍAS)</span>
+        <span class="section-title"><i class="fas fa-temperature-high"></i> HISTORIAL AGROCLIMï¿½TICO (30 Dï¿½AS)</span>
         <div class="chart-card">
             <div class="chart-header">
-                <button id="download-climate-chart" class="download-chart-btn"><i class="fas fa-download"></i> Descargar gráfico</button>
+                <button id="download-climate-chart" class="download-chart-btn"><i class="fas fa-download"></i> Descargar grï¿½fico</button>
             </div>
             <button id="toggle-climate-labels" class="toggle-labels-btn"><i class="fas fa-tag"></i></button>
             <div class="chart-wrapper">
@@ -468,7 +468,7 @@
             </div>
         </div>
 
-        <button id="btn-excel-report" class="btn-excel"><i class="fas fa-file-excel"></i> EXPORTAR REPORTE TÉCNICO</button>
+        <button id="btn-excel-report" class="btn-excel"><i class="fas fa-file-excel"></i> EXPORTAR REPORTE Tï¿½CNICO</button>
         <button id="btn-cuaderno" class="btn-excel" style="background: #2c3e66; margin-top: 16px;">
             <i class="fas fa-book-open"></i> CUADERNO DE CAMPO
         </button>
@@ -479,14 +479,14 @@
 <div id="chat-button"><i class="fas fa-comment-dots"></i></div>
 <div id="chat-window">
     <div class="chat-header">
-        <span><i class="fas fa-brain"></i> Tom · Asesor Agronómico</span>
+        <span><i class="fas fa-brain"></i> Tom ï¿½ Asesor Agronï¿½mico</span>
         <div>
             <button id="export-chat-pdf-btn" class="chat-download-btn" title="Exportar chat a PDF"><i class="fas fa-file-pdf"></i></button>
             <button onclick="toggleChat()">?</button>
         </div>
     </div>
-    <div class="chat-messages" id="chat-messages"><div class="bot-message">?? Hola, soy Tom. Selecciona una parcela, ingresa la fecha de siembra y podré analizar índices satelitales, estadio fenológico y pronóstico para darte recomendaciones precisas. También puedes pedirme: "genera un reporte pdf" o "exportar a pdf".</div></div>
-    <div class="chat-input-area"><input id="chat-input" placeholder="Ej: ¿Cómo proteger del frío?" onkeypress="if(event.key==='Enter')sendMessage()"><button onclick="sendMessage()">Enviar</button></div>
+    <div class="chat-messages" id="chat-messages"><div class="bot-message">?? Hola, soy Tom. Selecciona una parcela, ingresa la fecha de siembra y podrï¿½ analizar ï¿½ndices satelitales, estadio fenolï¿½gico y pronï¿½stico para darte recomendaciones precisas. Tambiï¿½n puedes pedirme: "genera un reporte pdf" o "exportar a pdf".</div></div>
+    <div class="chat-input-area"><input id="chat-input" placeholder="Ej: ï¿½Cï¿½mo proteger del frï¿½o?" onkeypress="if(event.key==='Enter')sendMessage()"><button onclick="sendMessage()">Enviar</button></div>
 </div>
 
 <div id="modal-cuaderno" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; align-items:center; justify-content:center;">
@@ -502,11 +502,11 @@
                 <div><label>?? Fecha</label><input type="date" id="labor-fecha" required></div>
                 <div><label>?? Operario</label><input type="text" id="labor-operario" placeholder="Nombre"></div>
                 <div><label>?? Tipo de labor</label><select id="labor-tipo" required>
-                    <option value="Preparación del suelo">Preparación del suelo</option>
+                    <option value="Preparaciï¿½n del suelo">Preparaciï¿½n del suelo</option>
                     <option value="Siembra">Siembra</option>
-                    <option value="Fertilización">Fertilización</option>
+                    <option value="Fertilizaciï¿½n">Fertilizaciï¿½n</option>
                     <option value="Riego">Riego</option>
-                    <option value="Aplicación fitosanitaria">Aplicación fitosanitaria</option>
+                    <option value="Aplicaciï¿½n fitosanitaria">Aplicaciï¿½n fitosanitaria</option>
                     <option value="Control de malezas">Control de malezas</option>
                     <option value="Cosecha">Cosecha</option>
                     <option value="Otra">Otra</option>
@@ -531,10 +531,10 @@
     const COLORS = { PRECIP: '#2c7da0', TEMP_MIN: '#2ecc71', TEMP_MAX: '#e67e22', HUMEDAD: '#f1c40f', BALANCE: '#16a085' };
     
     var map = L.map('map').setView([-25.3, -57.5], 11);
-    var googleSat = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { attribution: 'Google Satélite', maxZoom: 20 }).addTo(map);
+    var googleSat = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { attribution: 'Google Satï¿½lite', maxZoom: 20 }).addTo(map);
     var esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri', maxZoom: 19 });
-    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 });
-    L.control.layers({ "??? Google Satélite": googleSat, "?? ESRI Satélite": esriSat, "??? OpenStreetMap": osm }, null, { position: 'topright' }).addTo(map);
+    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'ï¿½ OpenStreetMap', maxZoom: 19 });
+    L.control.layers({ "??? Google Satï¿½lite": googleSat, "?? ESRI Satï¿½lite": esriSat, "??? OpenStreetMap": osm }, null, { position: 'topright' }).addTo(map);
     
     var frostLayer = null;
     var currentFeature = null;
@@ -572,19 +572,19 @@
         const infoCard = document.getElementById('parcela-info-card');
         
         currentParcelaData = {
-            Productor: props.Nombre || "—",
-            Cedula: props.C_I || "—",
-            Tecnico: props.N_Tecnico || "—",
-            Rubro: props.Rubro || "—",
-            Localidad: props.Localidad || "—"
+            Productor: props.Nombre || "ï¿½",
+            Cedula: props.C_I || "ï¿½",
+            Tecnico: props.N_Tecnico || "ï¿½",
+            Rubro: props.Rubro || "ï¿½",
+            Localidad: props.Localidad || "ï¿½"
         };
         
         const campos = [
-            { key: "Nombre", label: "Productor", icon: "fas fa-user-circle", default: "—" },
-            { key: "C_I", label: "Cédula", icon: "fas fa-id-card", default: "—" },
-            { key: "N_Tecnico", label: "Técnico", icon: "fas fa-chalkboard-user", default: "—" },
-            { key: "Rubro", label: "Rubro", icon: "fas fa-seedling", default: "—" },
-            { key: "Localidad", label: "Localidad", icon: "fas fa-map-pin", default: "—" }
+            { key: "Nombre", label: "Productor", icon: "fas fa-user-circle", default: "ï¿½" },
+            { key: "C_I", label: "Cï¿½dula", icon: "fas fa-id-card", default: "ï¿½" },
+            { key: "N_Tecnico", label: "Tï¿½cnico", icon: "fas fa-chalkboard-user", default: "ï¿½" },
+            { key: "Rubro", label: "Rubro", icon: "fas fa-seedling", default: "ï¿½" },
+            { key: "Localidad", label: "Localidad", icon: "fas fa-map-pin", default: "ï¿½" }
         ];
         
         let html = `<div class="parcela-info-grid">`;
@@ -628,7 +628,7 @@
                 }
             }).addTo(map);
             map.fitBounds(geoJsonLayer.getBounds());
-        } catch(e) { console.error(e); alert("No se pudieron cargar las parcelas. ¿El servidor está corriendo?"); }
+        } catch(e) { console.error(e); alert("No se pudieron cargar las parcelas. ï¿½El servidor estï¿½ corriendo?"); }
     }
     
     async function actualizarTodo() {
@@ -668,7 +668,7 @@
         document.getElementById('result-container').innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:baseline;"><div style="color:var(--primary); font-weight:700;">${data.tipo} medio</div><div style="font-size:1.8rem; font-weight:800;">${data.valor}</div></div>
             <div style="margin:12px 0;">?? Superficie total: <strong>${haTotal.toFixed(1)} ha</strong></div>${barras}
-            <div style="font-size:0.65rem; margin-top:12px; color:#64748b;">??? Imagen: ${data.fecha_satelite} · Resolución 10m</div>`;
+            <div style="font-size:0.65rem; margin-top:12px; color:#64748b;">??? Imagen: ${data.fecha_satelite} ï¿½ Resoluciï¿½n 10m</div>`;
         historial.push({Fecha: data.fecha_satelite, Tipo: data.tipo, Valor: data.valor});
     }
     
@@ -685,22 +685,22 @@
             data.forEach(d => { d.alerta_helada = (d.temp_min_c <= 3); });
             currentPronostico = data;
             const hayHelada = data.some(d => d.alerta_helada);
-            document.getElementById('helada-banner-container').innerHTML = hayHelada ? `<div class="helada-warning"><i class="fas fa-temperature-low fa-2x"></i><div><strong>?? ALERTA TÉCNICA</strong><br>Se prevén temperaturas = 3°C en los próximos días. Riesgo de helada.</div></div>` : '';
+            document.getElementById('helada-banner-container').innerHTML = hayHelada ? `<div class="helada-warning"><i class="fas fa-temperature-low fa-2x"></i><div><strong>?? ALERTA Tï¿½CNICA</strong><br>Se prevï¿½n temperaturas = 3ï¿½C en los prï¿½ximos dï¿½as. Riesgo de helada.</div></div>` : '';
             const fechas = data.map(d => d.fecha.slice(5));
             forecastChart.setOption({
                 tooltip: tooltipConfig,
-                legend: { data: ['Precipitación (mm)', 'Balance hídrico (mm)', 'Temperatura mínima (°C)', 'Temperatura máxima (°C)', 'Humedad relativa (%)'], ...legendBottom },
+                legend: { data: ['Precipitaciï¿½n (mm)', 'Balance hï¿½drico (mm)', 'Temperatura mï¿½nima (ï¿½C)', 'Temperatura mï¿½xima (ï¿½C)', 'Humedad relativa (%)'], ...legendBottom },
                 grid: { top: 45, left: 65, right: 75, bottom: 70, containLabel: true },
                 xAxis: { type: 'category', data: fechas, axisLabel: { rotate: 45, fontSize: 10, color: '#cbd5e1' } },
                 yAxis: [
-                    { type: 'value', name: 'Precipitación / Balance (mm)', nameTextStyle: { color: '#94a3b8' }, splitLine: { lineStyle: { color: '#1e293b' } }, axisLabel: { color: '#cbd5e1' } },
-                    { type: 'value', name: 'Temperatura (°C) / Humedad (%)', nameTextStyle: { color: '#94a3b8' }, splitLine: { show: false }, axisLabel: { color: '#cbd5e1' } }
+                    { type: 'value', name: 'Precipitaciï¿½n / Balance (mm)', nameTextStyle: { color: '#94a3b8' }, splitLine: { lineStyle: { color: '#1e293b' } }, axisLabel: { color: '#cbd5e1' } },
+                    { type: 'value', name: 'Temperatura (ï¿½C) / Humedad (%)', nameTextStyle: { color: '#94a3b8' }, splitLine: { show: false }, axisLabel: { color: '#cbd5e1' } }
                 ],
                 series: [
-                    { name: 'Precipitación (mm)', type: 'bar', data: data.map(d=>d.precipitacion_mm), itemStyle: { color: COLORS.PRECIP, borderRadius: [4,4,0,0] }, barWidth: '50%', yAxisIndex: 0, label: getLabelConfig() },
-                    { name: 'Balance hídrico (mm)', type: 'line', data: data.map(d=>d.balance_mm), lineStyle: { color: COLORS.BALANCE, width: 2, type: 'dashed' }, symbol: 'circle', symbolSize: 6, yAxisIndex: 0, label: getLabelConfig() },
-                    { name: 'Temperatura mínima (°C)', type: 'line', yAxisIndex: 1, data: data.map(d=>d.temp_min_c), lineStyle: { color: COLORS.TEMP_MIN, width: 2 }, label: getLabelConfig() },
-                    { name: 'Temperatura máxima (°C)', type: 'line', yAxisIndex: 1, data: data.map(d=>d.temp_max_c), lineStyle: { color: COLORS.TEMP_MAX, width: 2 }, label: getLabelConfig() },
+                    { name: 'Precipitaciï¿½n (mm)', type: 'bar', data: data.map(d=>d.precipitacion_mm), itemStyle: { color: COLORS.PRECIP, borderRadius: [4,4,0,0] }, barWidth: '50%', yAxisIndex: 0, label: getLabelConfig() },
+                    { name: 'Balance hï¿½drico (mm)', type: 'line', data: data.map(d=>d.balance_mm), lineStyle: { color: COLORS.BALANCE, width: 2, type: 'dashed' }, symbol: 'circle', symbolSize: 6, yAxisIndex: 0, label: getLabelConfig() },
+                    { name: 'Temperatura mï¿½nima (ï¿½C)', type: 'line', yAxisIndex: 1, data: data.map(d=>d.temp_min_c), lineStyle: { color: COLORS.TEMP_MIN, width: 2 }, label: getLabelConfig() },
+                    { name: 'Temperatura mï¿½xima (ï¿½C)', type: 'line', yAxisIndex: 1, data: data.map(d=>d.temp_max_c), lineStyle: { color: COLORS.TEMP_MAX, width: 2 }, label: getLabelConfig() },
                     { name: 'Humedad relativa (%)', type: 'line', yAxisIndex: 1, data: data.map(d=>d.humedad_relativa_max), lineStyle: { color: COLORS.HUMEDAD, width: 2, type: 'dashed' }, symbol: 'diamond', label: getLabelConfig() }
                 ]
             });
@@ -709,7 +709,7 @@
             data.forEach(d => {
                 boxes += `<div class="forecast-box ${d.alerta_helada ? 'helada' : ''}">
                             <span><strong>${d.fecha.slice(5)}</strong></span>
-                            <b>${d.temp_min_c}° / ${d.temp_max_c}°</b>
+                            <b>${d.temp_min_c}ï¿½ / ${d.temp_max_c}ï¿½</b>
                             <span>?? ${d.precipitacion_mm} mm</span>
                             <span style="display:block; font-size:0.65rem;">?? ${d.balance_mm} mm</span>
                             <span>?? Humedad: ${d.humedad_relativa_max}%</span>
@@ -718,7 +718,7 @@
             });
             document.getElementById('forecast-data-boxes').innerHTML = boxes;
         } catch(err) {
-            errorDiv.innerText = '? No se pudo cargar el pronóstico. Verifique la conexión con el servidor.';
+            errorDiv.innerText = '? No se pudo cargar el pronï¿½stico. Verifique la conexiï¿½n con el servidor.';
             errorDiv.style.display = 'block';
         }
     }
@@ -731,22 +731,22 @@
             });
             const data = await res.json();
             if (data.error) throw new Error(data.error);
-            if (!data.fechas || data.fechas.length === 0) throw new Error('Sin datos climáticos');
+            if (!data.fechas || data.fechas.length === 0) throw new Error('Sin datos climï¿½ticos');
             const fechas = data.fechas.map(f => f.split('-').slice(1).join('/'));
             climateChart.clear();
             climateChart.setOption({
                 tooltip: tooltipConfig,
-                legend: { data: ['Precipitación (mm)', 'Temperatura mínima (°C)', 'Temperatura máxima (°C)', 'Humedad relativa (%)'], ...legendBottom },
+                legend: { data: ['Precipitaciï¿½n (mm)', 'Temperatura mï¿½nima (ï¿½C)', 'Temperatura mï¿½xima (ï¿½C)', 'Humedad relativa (%)'], ...legendBottom },
                 grid: { top: 45, left: 60, right: 70, bottom: 70, containLabel: true },
                 xAxis: { type: 'category', data: fechas, axisLabel: { rotate: 45, fontSize: 9, color: '#cbd5e1' } },
                 yAxis: [
-                    { type: 'value', name: 'Precipitación (mm)', nameTextStyle: { color: '#94a3b8' }, splitLine: { lineStyle: { color: '#1e293b' } }, axisLabel: { color: '#cbd5e1' } },
+                    { type: 'value', name: 'Precipitaciï¿½n (mm)', nameTextStyle: { color: '#94a3b8' }, splitLine: { lineStyle: { color: '#1e293b' } }, axisLabel: { color: '#cbd5e1' } },
                     { type: 'value', name: 'Temperatura / Humedad', nameTextStyle: { color: '#94a3b8' }, splitLine: { show: false }, axisLabel: { color: '#cbd5e1' } }
                 ],
                 series: [
-                    { name: 'Precipitación (mm)', type: 'bar', yAxisIndex: 0, data: data.precipitacion, itemStyle: { color: COLORS.PRECIP, borderRadius: [4,4,0,0] }, barWidth: '55%', label: getLabelConfig() },
-                    { name: 'Temperatura mínima (°C)', type: 'line', yAxisIndex: 1, data: data.temp_min, smooth: true, lineStyle: { color: COLORS.TEMP_MIN, width: 2 }, areaStyle: { opacity: 0.1 }, label: getLabelConfig() },
-                    { name: 'Temperatura máxima (°C)', type: 'line', yAxisIndex: 1, data: data.temp_max, smooth: true, lineStyle: { color: COLORS.TEMP_MAX, width: 2 }, areaStyle: { opacity: 0.1 }, label: getLabelConfig() },
+                    { name: 'Precipitaciï¿½n (mm)', type: 'bar', yAxisIndex: 0, data: data.precipitacion, itemStyle: { color: COLORS.PRECIP, borderRadius: [4,4,0,0] }, barWidth: '55%', label: getLabelConfig() },
+                    { name: 'Temperatura mï¿½nima (ï¿½C)', type: 'line', yAxisIndex: 1, data: data.temp_min, smooth: true, lineStyle: { color: COLORS.TEMP_MIN, width: 2 }, areaStyle: { opacity: 0.1 }, label: getLabelConfig() },
+                    { name: 'Temperatura mï¿½xima (ï¿½C)', type: 'line', yAxisIndex: 1, data: data.temp_max, smooth: true, lineStyle: { color: COLORS.TEMP_MAX, width: 2 }, areaStyle: { opacity: 0.1 }, label: getLabelConfig() },
                     { name: 'Humedad relativa (%)', type: 'line', yAxisIndex: 1, data: data.humedad, smooth: true, symbol: 'diamond', lineStyle: { color: COLORS.HUMEDAD, width: 2, type: 'dashed' }, label: getLabelConfig() }
                 ]
             });
@@ -754,7 +754,7 @@
         } catch(err) {
             console.error("ERROR HISTORIAL:", err);
             climateChart.clear();
-            climateChart.setOption({ title: { show: true, text: 'No se pudo cargar historial climático', left: 'center', top: 'middle', textStyle: { color: '#94a3b8', fontSize: 14 } } });
+            climateChart.setOption({ title: { show: true, text: 'No se pudo cargar historial climï¿½tico', left: 'center', top: 'middle', textStyle: { color: '#94a3b8', fontSize: 14 } } });
         }
     }
     
@@ -762,7 +762,7 @@
         const cultivo = document.getElementById('cultivo-select').value;
         const fechaSiembra = document.getElementById('fecha-siembra').value;
         const variedad = document.getElementById('nombre-variedad').value;
-        document.getElementById('recomendacion-container').innerHTML = `<i class="fas fa-leaf"></i> Recomendación basada en ${cultivo}. Siembra: ${fechaSiembra}. Variedad: ${variedad || 'No especificada'}.<br>Consulte el chat para más detalles.`;
+        document.getElementById('recomendacion-container').innerHTML = `<i class="fas fa-leaf"></i> Recomendaciï¿½n basada en ${cultivo}. Siembra: ${fechaSiembra}. Variedad: ${variedad || 'No especificada'}.<br>Consulte el chat para mï¿½s detalles.`;
     }
     
     function setModo(modo, btn) {
@@ -773,7 +773,7 @@
     }
     
     document.getElementById('toggle-frost-btn').addEventListener('click', async () => {
-        if (frostLayer) { map.removeLayer(frostLayer); frostLayer = null; document.getElementById('toggle-frost-btn').style.borderColor = 'var(--accent)'; document.getElementById('toggle-frost-btn').innerHTML = '<i class="fas fa-temperature-low"></i> Mostrar mapa de heladas (última noche)'; return; }
+        if (frostLayer) { map.removeLayer(frostLayer); frostLayer = null; document.getElementById('toggle-frost-btn').style.borderColor = 'var(--accent)'; document.getElementById('toggle-frost-btn').innerHTML = '<i class="fas fa-temperature-low"></i> Mostrar mapa de heladas (ï¿½ltima noche)'; return; }
         document.getElementById('loading').style.display = 'block';
         try {
             const res = await fetch('/api/mapa_heladas', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ feature: currentFeature }) });
@@ -811,14 +811,14 @@
         const productorData = `
             <table style="width:100%; border-collapse:collapse; margin:15px 0; background:#f8f9fa;">
                 <tr><td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Productor</strong></td><td style="padding:8px; border-bottom:1px solid #ddd;">${currentParcelaData.Productor}</td></tr>
-                <tr><td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Cédula</strong></td><td style="padding:8px; border-bottom:1px solid #ddd;">${currentParcelaData.Cedula}</td></tr>
-                <tr><td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Nombre del Técnico</strong></td><td style="padding:8px; border-bottom:1px solid #ddd;">${currentParcelaData.Tecnico}</td></tr>
+                <tr><td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Cï¿½dula</strong></td><td style="padding:8px; border-bottom:1px solid #ddd;">${currentParcelaData.Cedula}</td></tr>
+                <tr><td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Nombre del Tï¿½cnico</strong></td><td style="padding:8px; border-bottom:1px solid #ddd;">${currentParcelaData.Tecnico}</td></tr>
                 <tr><td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Rubro</strong></td><td style="padding:8px; border-bottom:1px solid #ddd;">${currentParcelaData.Rubro}</td></tr>
                 <tr><td style="padding:8px;"><strong>Localidad</strong></td><td style="padding:8px;">${currentParcelaData.Localidad}</td></tr>
             </table>
         `;
         
-        const contenido = `<html><head><meta charset="UTF-8"><title>Reporte Técnico - FrutihorMonitor</title><style>body{font-family:'Inter',Arial,sans-serif;padding:30px;background:white;color:#0f172a;}h1{color:#f97316;}.section{margin-bottom:30px;border-bottom:1px solid #ccc;padding-bottom:15px;}.forecast-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}.forecast-box{background:#f1f5f9;padding:8px;border-radius:12px;text-align:center;}.helada{border-left:4px solid #ef4444;background:#fee2e2;}</style></head><body><h1>?? Reporte Técnico FrutihorMonitor PRO</h1><p><strong>Parcela:</strong> ${currentParcelaNombre}</p><p><strong>Fecha de generación:</strong> ${new Date().toLocaleString()}</p><div class="section"><h2>????? Datos del Productor</h2>${productorData}</div><div class="section"><h2>?? Datos del Cultivo</h2><p><strong>Cultivo:</strong> ${cultivo}</p><p><strong>Variedad:</strong> ${variedad}</p><p><strong>Fecha de siembra:</strong> ${fechaSiembra}</p><p><strong>Fecha de monitoreo satelital:</strong> ${fechaMonitoreo}</p></div><div class="section"><h2>?? Análisis de Índices</h2>${analisisHtml}</div><div class="section"><h2>?? Recomendación Inteligente</h2>${recomendacionHtml}</div><div class="section"><h2>??? Historial Climático (últimos 30 días)</h2>${climateChartImg || '<p>Gráfico no disponible</p>'}</div><div class="section"><h2>? Pronóstico Agroclimático 10 días</h2>${forecastChartImg || '<p>Gráfico no disponible</p>'}<div class="forecast-grid">${pronosticoHtml}</div></div><footer style="margin-top:40px; font-size:10px; color:#64748b; text-align:center;">Generado por FrutihorMonitor · NABLA CONSULTORES S.R.L</footer></body></html>`;
+        const contenido = `<html><head><meta charset="UTF-8"><title>Reporte Tï¿½cnico - FrutihorMonitor</title><style>body{font-family:'Inter',Arial,sans-serif;padding:30px;background:white;color:#0f172a;}h1{color:#f97316;}.section{margin-bottom:30px;border-bottom:1px solid #ccc;padding-bottom:15px;}.forecast-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}.forecast-box{background:#f1f5f9;padding:8px;border-radius:12px;text-align:center;}.helada{border-left:4px solid #ef4444;background:#fee2e2;}</style></head><body><h1>?? Reporte Tï¿½cnico FrutihorMonitor PRO</h1><p><strong>Parcela:</strong> ${currentParcelaNombre}</p><p><strong>Fecha de generaciï¿½n:</strong> ${new Date().toLocaleString()}</p><div class="section"><h2>????? Datos del Productor</h2>${productorData}</div><div class="section"><h2>?? Datos del Cultivo</h2><p><strong>Cultivo:</strong> ${cultivo}</p><p><strong>Variedad:</strong> ${variedad}</p><p><strong>Fecha de siembra:</strong> ${fechaSiembra}</p><p><strong>Fecha de monitoreo satelital:</strong> ${fechaMonitoreo}</p></div><div class="section"><h2>?? Anï¿½lisis de ï¿½ndices</h2>${analisisHtml}</div><div class="section"><h2>?? Recomendaciï¿½n Inteligente</h2>${recomendacionHtml}</div><div class="section"><h2>??? Historial Climï¿½tico (ï¿½ltimos 30 dï¿½as)</h2>${climateChartImg || '<p>Grï¿½fico no disponible</p>'}</div><div class="section"><h2>? Pronï¿½stico Agroclimï¿½tico 10 dï¿½as</h2>${forecastChartImg || '<p>Grï¿½fico no disponible</p>'}<div class="forecast-grid">${pronosticoHtml}</div></div><footer style="margin-top:40px; font-size:10px; color:#64748b; text-align:center;">Generado por FrutihorMonitor ï¿½ NABLA CONSULTORES S.R.L</footer></body></html>`;
         const ventana = window.open('', '_blank');
         ventana.document.write(contenido);
         ventana.document.close();
@@ -831,9 +831,9 @@
     function exportChatToPDF() { 
         const messages = document.querySelectorAll('#chat-messages .user-message, #chat-messages .bot-message'); 
         if (messages.length === 0) { alert("No hay mensajes en el chat para exportar."); return; } 
-        let html = `<html><head><meta charset="UTF-8"><title>Resumen Chat - FrutihorMonitor</title><style>body{font-family:'Inter',Arial,sans-serif;padding:30px;background:white;color:#0f172a;}h1{color:#f97316;}.message{margin-bottom:15px;padding:10px;border-radius:12px;}.user{background:#f97316;color:white;text-align:right;}.bot{background:#e2e8f0;color:#0f172a;}.timestamp{font-size:10px;color:#64748b;margin-top:5px;}</style></head><body><h1>?? Resumen de Conversación - Asistente Tom</h1><p>Fecha: ${new Date().toLocaleString()}</p><hr>`; 
-        messages.forEach((msg, idx) => { const isUser = msg.classList.contains('user-message'); const text = msg.innerText; html += `<div class="message ${isUser ? 'user' : 'bot'}"><strong>${isUser ? '?? Tú' : '?? Tom'}:</strong><br>${text}<div class="timestamp">${new Date().toLocaleTimeString()}</div></div>`; }); 
-        html += `<hr><footer style="margin-top:40px; font-size:10px; color:#64748b; text-align:center;">Generado por FrutihorMonitor · NABLA CONSULTORES S.R.L</footer></body></html>`; 
+        let html = `<html><head><meta charset="UTF-8"><title>Resumen Chat - FrutihorMonitor</title><style>body{font-family:'Inter',Arial,sans-serif;padding:30px;background:white;color:#0f172a;}h1{color:#f97316;}.message{margin-bottom:15px;padding:10px;border-radius:12px;}.user{background:#f97316;color:white;text-align:right;}.bot{background:#e2e8f0;color:#0f172a;}.timestamp{font-size:10px;color:#64748b;margin-top:5px;}</style></head><body><h1>?? Resumen de Conversaciï¿½n - Asistente Tom</h1><p>Fecha: ${new Date().toLocaleString()}</p><hr>`; 
+        messages.forEach((msg, idx) => { const isUser = msg.classList.contains('user-message'); const text = msg.innerText; html += `<div class="message ${isUser ? 'user' : 'bot'}"><strong>${isUser ? '?? Tï¿½' : '?? Tom'}:</strong><br>${text}<div class="timestamp">${new Date().toLocaleTimeString()}</div></div>`; }); 
+        html += `<hr><footer style="margin-top:40px; font-size:10px; color:#64748b; text-align:center;">Generado por FrutihorMonitor ï¿½ NABLA CONSULTORES S.R.L</footer></body></html>`; 
         const ventana = window.open('', '_blank'); ventana.document.write(html); ventana.document.close(); ventana.print(); 
     }
     
@@ -845,14 +845,14 @@
         input.value = '';
         const lower = text.toLowerCase();
         if (lower.includes('pdf') || lower.includes('reporte') || lower.includes('generar reporte') || lower.includes('exportar a pdf')) {
-            addMessage("?? Generando reporte técnico en PDF...", false);
+            addMessage("?? Generando reporte tï¿½cnico en PDF...", false);
             setTimeout(() => generarReportePDF(), 500);
             return;
         }
         addMessage("?? Analizando...", false);
         
-        const productorInfo = `Productor: ${currentParcelaData.Productor}, Cédula: ${currentParcelaData.Cedula}, Técnico: ${currentParcelaData.Tecnico}, Rubro: ${currentParcelaData.Rubro}, Localidad: ${currentParcelaData.Localidad}`;
-        const contexto = `Cultivo: ${document.getElementById('cultivo-select').value}, Fenología según siembra: ${document.getElementById('fecha-siembra').value}, Heladas pronosticadas: ${currentPronostico.some(d=>d.alerta_helada)}. Datos del productor: ${productorInfo}`;
+        const productorInfo = `Productor: ${currentParcelaData.Productor}, Cï¿½dula: ${currentParcelaData.Cedula}, Tï¿½cnico: ${currentParcelaData.Tecnico}, Rubro: ${currentParcelaData.Rubro}, Localidad: ${currentParcelaData.Localidad}`;
+        const contexto = `Cultivo: ${document.getElementById('cultivo-select').value}, Fenologï¿½a segï¿½n siembra: ${document.getElementById('fecha-siembra').value}, Heladas pronosticadas: ${currentPronostico.some(d=>d.alerta_helada)}. Datos del productor: ${productorInfo}`;
         
         try {
             const res = await fetch('/api/chat', {
@@ -866,7 +866,7 @@
             addMessage(reply, false);
         } catch(e) {
             document.querySelector('#chat-messages .bot-message:last-child').remove();
-            addMessage("Error de conexión con el servidor. Intente nuevamente.", false);
+            addMessage("Error de conexiï¿½n con el servidor. Intente nuevamente.", false);
         }
     }
     
@@ -879,9 +879,9 @@
     const listaLaboresDiv = document.getElementById('lista-labores');
     function abrirCuaderno() { if (!currentParcelaId) { alert("Primero selecciona una parcela en el mapa."); return; } parcelaInfoDiv.innerHTML = `<strong>?? Parcela:</strong> ${currentParcelaNombre || currentParcelaId}<br><strong>Productor:</strong> ${currentParcelaData.Productor}`; document.getElementById('parcela-id-input').value = currentParcelaId; document.getElementById('labor-fecha').valueAsDate = new Date(); cargarHistorial(); modalCuaderno.style.display = 'flex'; }
     function cerrarModal() { modalCuaderno.style.display = 'none'; }
-    async function cargarHistorial() { listaLaboresDiv.innerHTML = '<div style="text-align:center;">Cargando...</div>'; try { const res = await fetch(`/api/eventos?parcela_id=${encodeURIComponent(currentParcelaId)}`); const labores = await res.json(); if (!Array.isArray(labores)) throw new Error(); if (labores.length === 0) { listaLaboresDiv.innerHTML = '<div style="text-align:center; color:#94a3b8;">No hay registros aún.</div>'; return; } let html = ''; labores.forEach(lab => { html += `<div class="labor-item" data-id="${lab.id}"><div class="fecha">?? ${lab.fecha}</div><div><strong>${lab.tipo_labor}</strong> ${lab.insumo ? `· ${lab.insumo} (${lab.dosis})` : ''}</div><div>?? ${lab.operario || '—'}</div><div class="observaciones">?? ${lab.observaciones || ''}</div><div class="labor-actions"><button onclick="eliminarLabor(${lab.id})"><i class="fas fa-trash-alt"></i> Eliminar</button></div></div>`; }); listaLaboresDiv.innerHTML = html; } catch(err) { listaLaboresDiv.innerHTML = '<div style="color:#ef4444;">Error al cargar historial.</div>'; } }
-    async function guardarLabor(event) { event.preventDefault(); const data = { parcela_id: currentParcelaId, fecha: document.getElementById('labor-fecha').value, tipo: document.getElementById('labor-tipo').value, insumo: document.getElementById('labor-insumo').value, dosis: document.getElementById('labor-dosis').value, operario: document.getElementById('labor-operario').value, observaciones: document.getElementById('labor-obs').value }; try { const res = await fetch('/api/eventos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); if (res.ok) { alert("Registro guardado"); formLabor.reset(); document.getElementById('labor-fecha').valueAsDate = new Date(); cargarHistorial(); } else { const err = await res.json(); alert("Error: " + err.error); } } catch(err) { alert("Error de conexión"); } }
-    async function eliminarLabor(id) { if (!confirm("¿Eliminar este registro?")) return; try { const res = await fetch(`/api/eventos/${id}`, { method: 'DELETE' }); if (res.ok) cargarHistorial(); else alert("No se pudo eliminar"); } catch(err) { alert("Error"); } }
+    async function cargarHistorial() { listaLaboresDiv.innerHTML = '<div style="text-align:center;">Cargando...</div>'; try { const res = await fetch(`/api/eventos?parcela_id=${encodeURIComponent(currentParcelaId)}`); const labores = await res.json(); if (!Array.isArray(labores)) throw new Error(); if (labores.length === 0) { listaLaboresDiv.innerHTML = '<div style="text-align:center; color:#94a3b8;">No hay registros aï¿½n.</div>'; return; } let html = ''; labores.forEach(lab => { html += `<div class="labor-item" data-id="${lab.id}"><div class="fecha">?? ${lab.fecha}</div><div><strong>${lab.tipo_labor}</strong> ${lab.insumo ? `ï¿½ ${lab.insumo} (${lab.dosis})` : ''}</div><div>?? ${lab.operario || 'ï¿½'}</div><div class="observaciones">?? ${lab.observaciones || ''}</div><div class="labor-actions"><button onclick="eliminarLabor(${lab.id})"><i class="fas fa-trash-alt"></i> Eliminar</button></div></div>`; }); listaLaboresDiv.innerHTML = html; } catch(err) { listaLaboresDiv.innerHTML = '<div style="color:#ef4444;">Error al cargar historial.</div>'; } }
+    async function guardarLabor(event) { event.preventDefault(); const data = { parcela_id: currentParcelaId, fecha: document.getElementById('labor-fecha').value, tipo: document.getElementById('labor-tipo').value, insumo: document.getElementById('labor-insumo').value, dosis: document.getElementById('labor-dosis').value, operario: document.getElementById('labor-operario').value, observaciones: document.getElementById('labor-obs').value }; try { const res = await fetch('/api/eventos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); if (res.ok) { alert("Registro guardado"); formLabor.reset(); document.getElementById('labor-fecha').valueAsDate = new Date(); cargarHistorial(); } else { const err = await res.json(); alert("Error: " + err.error); } } catch(err) { alert("Error de conexiï¿½n"); } }
+    async function eliminarLabor(id) { if (!confirm("ï¿½Eliminar este registro?")) return; try { const res = await fetch(`/api/eventos/${id}`, { method: 'DELETE' }); if (res.ok) cargarHistorial(); else alert("No se pudo eliminar"); } catch(err) { alert("Error"); } }
     function exportarCuadernoExcel() { fetch(`/api/eventos?parcela_id=${encodeURIComponent(currentParcelaId)}`).then(res=>res.json()).then(labores=>{ const ws = XLSX.utils.json_to_sheet(labores); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, `Cuaderno_${currentParcelaId}`); XLSX.writeFile(wb, `cuaderno_${currentParcelaId}.xlsx`); }).catch(err=>alert("Error al exportar")); }
     function exportarCuadernoPDF() { const contenido = document.getElementById('lista-labores').cloneNode(true); const ventana = window.open('', '_blank'); ventana.document.write(`<html><head><meta charset="UTF-8"><title>Cuaderno de Campo - ${currentParcelaNombre}</title><style>body{font-family:Arial;padding:20px}.labor-item{border:1px solid #ccc;margin-bottom:15px;padding:10px;border-radius:8px}.fecha{font-weight:bold;color:#f97316}</style></head><body><h2>Cuaderno de Campo - ${currentParcelaNombre}</h2><p><strong>Productor:</strong> ${currentParcelaData.Productor}</p>${contenido.outerHTML}</body></html>`); ventana.document.close(); ventana.print(); }
     
@@ -905,6 +905,7 @@
     cargarParcelas();
     document.getElementById('cultivo-select').addEventListener('change', () => actualizarRecomendacion());
     document.getElementById('fecha-siembra').addEventListener('change', () => actualizarRecomendacion());
+	
 </script>
 </body>
 </html>
